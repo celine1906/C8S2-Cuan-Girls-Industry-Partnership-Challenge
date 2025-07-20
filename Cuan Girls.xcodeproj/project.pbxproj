@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		12D5EDE52E2CD0CC00F6B4C1 /* GoogleGenerativeAI in Frameworks */ = {isa = PBXBuildFile; productRef = 12D5EDE42E2CD0CC00F6B4C1 /* GoogleGenerativeAI */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		1236E9522E2A33F00058D1D4 /* Cuan Girls.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Cuan Girls.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				12D5EDE52E2CD0CC00F6B4C1 /* GoogleGenerativeAI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = "Cuan Girls";
 			packageProductDependencies = (
+				12D5EDE42E2CD0CC00F6B4C1 /* GoogleGenerativeAI */,
 			);
 			productName = "Cuan Girls";
 			productReference = 1236E9522E2A33F00058D1D4 /* Cuan Girls.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = 1236E9492E2A33F00058D1D4;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				12D5EDE32E2CD0CC00F6B4C1 /* XCRemoteSwiftPackageReference "deprecated-generative-ai-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1236E9532E2A33F00058D1D4 /* Products */;
 			projectDirPath = "";
@@ -324,6 +333,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		12D5EDE32E2CD0CC00F6B4C1 /* XCRemoteSwiftPackageReference "deprecated-generative-ai-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google-gemini/deprecated-generative-ai-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.5.6;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		12D5EDE42E2CD0CC00F6B4C1 /* GoogleGenerativeAI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 12D5EDE32E2CD0CC00F6B4C1 /* XCRemoteSwiftPackageReference "deprecated-generative-ai-swift" */;
+			productName = GoogleGenerativeAI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 1236E94A2E2A33F00058D1D4 /* Project object */;
 }
