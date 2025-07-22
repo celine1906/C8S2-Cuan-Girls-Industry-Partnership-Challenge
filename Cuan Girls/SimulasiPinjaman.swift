@@ -1,0 +1,235 @@
+
+import SwiftUI
+
+struct SimulasiPinjaman: View {
+    enum SimulasiTab: String, CaseIterable {
+        case tepatWaktu = "Tepat Waktu"
+        case telat1Bulan = "Telat 1 Bulan"
+        case telat3Bulan = "Telat 3 Bulan"
+    }
+    
+    @State private var selectedTab: SimulasiTab = .tepatWaktu
+
+    var body: some View {
+        @State var pinjaman: CGFloat = 6000000
+        @State var tenor: CGFloat = 180
+        
+        let bunga: CGFloat = 0.003 * pinjaman
+        let bungaTotal: CGFloat = bunga * tenor
+        
+        ZStack  {
+            Color.background
+                .ignoresSafeArea(edges: .bottom)
+            
+            VStack (alignment: .center){
+                HStack {
+                    ForEach(SimulasiTab.allCases, id: \.self) { tab in
+                        Button(action: {
+                            selectedTab = tab
+                        }) {
+                            Text(tab.rawValue)
+                                .fontWeight(selectedTab == tab ? .semibold : .regular)
+                                .padding(10)
+                                .foregroundColor(selectedTab == tab ? Color.black : Color.gray)
+                                .background(selectedTab == tab ? Color.white : Color.clear)
+                                .cornerRadius(8)
+                                .font(.subheadline)
+                        }
+                        .disabled(selectedTab == tab)
+                    }
+                }
+                .padding(.bottom, 16)
+                .cornerRadius(8)
+                
+                ScrollView {
+                    VStack {
+                        VStack(alignment: .leading, spacing: 12) {
+                            infoRow(label: "Nominal Pinjaman", value: "Rp" + formatToCurrency(pinjaman))
+                            infoRow(label: "Bunga Harian (0,3%)", value: "Rp" + formatToCurrency(bunga))
+                            infoRow(label: "Tenor", value: "180 hari")
+                            infoRow(label: "Total Bunga", value: "Rp" + formatToCurrency(bungaTotal), valueColor: .black, isBold: true)
+
+                            if selectedTab == .telat1Bulan {
+                                HStack(alignment: .top, spacing: 4) {
+                                    VStack (alignment: .leading) {
+                                        Text("Telat 1 Bulan")
+                                            .font(.subheadline)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(.red)
+                                        
+                                        Text("*Penalti harian (0,1%)")
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                    }
+                                   
+                                    Spacer()
+                                    
+                                    Text("+ Rp" + formatToCurrency(0.001 * pinjaman * 30))
+                                        .foregroundColor(.red)
+                                }
+                                .padding()
+                                .background(Color.red.opacity(0.1))
+                                .cornerRadius(10)
+                            } else if selectedTab == .telat3Bulan {
+                                HStack(alignment: .top, spacing: 4) {
+                                    VStack (alignment: .leading) {
+                                        Text("Telat 3 Bulan")
+                                            .font(.subheadline)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(.red)
+                                        
+                                        Text("*Penalti harian (0,1%)")
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                    }
+                                   
+                                    Spacer()
+                                    
+                                    Text("+ Rp" + formatToCurrency(0.001 * pinjaman * 180))
+                                        .foregroundColor(.red)
+                                }
+                                .padding()
+                                .background(Color.red.opacity(0.1))
+                                .cornerRadius(10)
+                            }
+                            
+                            Divider()
+
+                            if selectedTab == .telat1Bulan {
+                                HStack {
+                                    Text("Total Pelunasan")
+                                        .bold()
+                                    
+                                    Spacer()
+                                    
+                                    Text("Rp" + formatToCurrency(pinjaman + bungaTotal + 0.001 * pinjaman * 30))
+                                        .foregroundColor(.black)
+                                        .fontWeight(.bold)
+                                }
+                                .padding(.top, 4)
+                                
+                                Text("Rp 9.240.000")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                    .strikethrough()
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                            } else if selectedTab == .telat3Bulan {
+                                HStack {
+                                    Text("Total Pelunasan")
+                                        .bold()
+                                    
+                                    Spacer()
+                                    
+                                    Text("Rp" + formatToCurrency(pinjaman + bungaTotal + 0.001 * pinjaman * 180))
+                                        .foregroundColor(.black)
+                                        .fontWeight(.bold)
+                                }
+                                .padding(.top, 4)
+                                
+                                Text("Rp 9.240.000")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                    .strikethrough()
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                            } else {
+                                infoRow(label: "Total Pelunasan", value: "Rp" + formatToCurrency(pinjaman + bungaTotal), valueColor: .black)
+                            }
+
+                            if selectedTab == .telat1Bulan {
+                                infoRow(label: "Cicilan Bulanan", value: "Rp" + formatToCurrency((pinjaman + bungaTotal + 0.001 * pinjaman * 30)/(tenor/30)), valueColor: .red)
+                            } else if selectedTab == .telat3Bulan {
+                                infoRow(label: "Cicilan Bulanan", value: "Rp" + formatToCurrency((pinjaman + bungaTotal + 0.001 * pinjaman * 30)/(tenor/30)), valueColor: .red)
+                            } else {
+                                infoRow(label: "Cicilan Bulanan", value: "Rp" + formatToCurrency((pinjaman + bungaTotal)/(tenor/30)), valueColor: .green)
+                            }
+                            
+                        }
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        .padding(.horizontal)
+
+                        
+                        VStack(alignment: .leading, spacing: 16) {
+                            tipsRow(icon: "lightbulb.fill", color: .yellow, title: "Perhatikan jumlah total pelunasan,", subtitle: "bukan hanya cicilan per bulan.")
+                            
+                            Divider()
+                            
+                            tipsRow(icon: "clock.fill", color: .blue, title: "Selalu bayar tepat waktu", subtitle: "hindari denda & jaga skor kreditmu.")
+                            
+                            Divider()
+                            
+                            tipsRow(icon: "exclamationmark.triangle.fill", color: .orange, title: "Gagal bayar akan merusak skor kredit", subtitle: "Akses pinjamanmu dapat terbatas.")
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        .padding(.horizontal)
+                        .padding(.top, 16)
+                    }
+                }
+                Spacer()
+
+                Text("*Limit pinjaman tiap platform dapat bervariasi. Jumlah yang dikalkulasikan hanya untuk keperluan simulasi.")
+                    .font(.footnote)
+                    .foregroundColor(.gray)
+                    .padding(.top, 8)
+
+                Button("Selesai") {
+                    // Action
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(.button)
+                .foregroundColor(.white)
+                .cornerRadius(10)
+                .padding(.horizontal)
+                
+            }
+            .frame(maxHeight: .infinity, alignment: .leading)
+            .padding(.top, 20)
+            .navigationTitle("Detail Simulasi")
+            .navigationBarTitleDisplayMode(.inline)
+            
+            
+        }
+    }
+
+    func infoRow(label: String, value: String, valueColor: Color = .black, isBold: Bool = false) -> some View {
+        HStack {
+            Text(label)
+                .bold()
+            
+            Spacer()
+            
+            Text(value)
+                .foregroundColor(valueColor)
+                .fontWeight(isBold ? .semibold : .regular)
+        }
+        .padding(.vertical, 4)
+    }
+
+    func tipsRow(icon: String, color: Color, title: String, subtitle: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundColor(color)
+                .frame(width: 30)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundColor(.black)
+            }
+        }
+    }
+}
+
+#Preview {
+    SimulasiPinjaman()
+}
