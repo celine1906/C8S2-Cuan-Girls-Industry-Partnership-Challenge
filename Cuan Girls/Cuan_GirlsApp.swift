@@ -11,7 +11,7 @@ import SwiftUI
 struct Cuan_GirlsApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            LoanHomeView()
         }
     }
 }
