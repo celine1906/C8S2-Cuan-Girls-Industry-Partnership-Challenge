@@ -1,6 +1,10 @@
 import SwiftUI
 
 struct RekomendasiFinansial: View {
+    
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var viewModel = RekomendasiFinansialViewModel()
+    
     var body: some View {
         @State var pendapatan: CGFloat = 1000000
         @State var pengeluaran: CGFloat =  800000

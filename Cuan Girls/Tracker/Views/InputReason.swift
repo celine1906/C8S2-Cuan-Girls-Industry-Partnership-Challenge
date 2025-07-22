@@ -1,63 +1,55 @@
 import SwiftUI
 
 struct InputReasonView: View {
+    @FocusState private var isPriceFieldFocused: Bool
+
     @Environment(\.dismiss) private var dismiss
-    
-    @State private var itemName: String = ""
-    @State private var itemPrice: Double = 0
-    @State private var itemPriceText: String = ""
-    @State private var isIncomeFluctuating: Bool? = nil
-    
-    private let currencyFormatter = NumberFormatter.rupiah
-    
+    @StateObject private var viewModel = UserWantsViewModel()
+
     var body: some View {
         VStack(spacing: 24) {
-            // Icon
             Image("walletIcon")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 80, height: 80)
-                .foregroundColor(.gray)
                 .padding(.top, 32)
 
-            // Form
             VStack(alignment: .leading, spacing: 16) {
                 Text("Apa yang ingin kamu beli?")
                     .font(.subheadline)
                 
-                TextField("Aku mau beli...", text: $itemName)
+                TextField("Aku mau beli...", text: $viewModel.itemName)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
 
                 Text("Nominal barang")
                     .font(.subheadline)
-                
-                TextField("Rp 0", text: $itemPriceText)
+
+                TextField("Rp 0", text: $viewModel.rawItemPriceText)
                     .keyboardType(.numberPad)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .onChange(of: itemPriceText) { newValue in
-                        let raw = newValue.replacingOccurrences(of: ".", with: "")
-                        if let doubleValue = Double(raw) {
-                            itemPrice = doubleValue
-                            itemPriceText = currencyFormatter.string(from: NSNumber(value: doubleValue)) ?? ""
-                        } else {
-                            itemPrice = 0
+                    .focused($isPriceFieldFocused)
+                    .onChange(of: isPriceFieldFocused) { focused, newValue in
+                        if !focused {
+                            viewModel.formatPriceText()
                         }
                     }
-                    .onAppear {
-                        if itemPrice > 0 {
-                            itemPriceText = currencyFormatter.string(from: NSNumber(value: itemPrice)) ?? ""
-                        }
-                    }
+
+                // Pesan error
+                if viewModel.isPriceTooHigh {
+                    Text("Maksimal peminjaman pada P2P Lending adalah Rp 100.000.000")
+                        .font(.caption)
+                        .foregroundColor(.red)
+                }
 
                 Text("Apakah pendapatanmu fluktuatif?")
                     .font(.subheadline)
 
                 HStack {
-                    RadioButton(title: "Ya", isSelected: isIncomeFluctuating == true) {
-                        isIncomeFluctuating = true
+                    RadioButton(title: "Ya", isSelected: viewModel.isIncomeFluctuating == true) {
+                        viewModel.isIncomeFluctuating = true
                     }
-                    RadioButton(title: "Tidak", isSelected: isIncomeFluctuating == false) {
-                        isIncomeFluctuating = false
+                    RadioButton(title: "Tidak", isSelected: viewModel.isIncomeFluctuating == false) {
+                        viewModel.isIncomeFluctuating = false
                     }
                 }
             }
@@ -65,12 +57,17 @@ struct InputReasonView: View {
 
             Spacer()
 
-            // Tombol navigasi
-            NavigationLink(destination: InputTrackerView()) {
+
+            Button(action: {
+                if viewModel.isFormValid {
+                    viewModel.save()
+                    viewModel.isNavigating = true
+                }
+            }) {
                 Text("Lanjut")
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.white)
+                    .background(viewModel.isFormValid ? Color.white : Color.gray.opacity(0.4))
                     .foregroundColor(.black)
                     .cornerRadius(12)
                     .overlay(
@@ -78,8 +75,10 @@ struct InputReasonView: View {
                             .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                     )
             }
+            .disabled(!viewModel.isFormValid)
             .padding(.horizontal, 24)
             .padding(.bottom, 32)
+
         }
         .navigationTitle("Simulasi Peminjaman")
         .navigationBarTitleDisplayMode(.inline)
@@ -98,12 +97,15 @@ struct InputReasonView: View {
             }
         }
         .background(Color(.systemGray6))
+        .navigationDestination(isPresented: $viewModel.isNavigating) {
+            if let userWants = viewModel.userWants {
+                InputTrackerView(userWants: userWants)
+            }
+        }
+
     }
 }
 
-struct InputReasonView_Previews: PreviewProvider {
-    static var previews: some View {
-        InputReasonView()
-    }
+#Preview {
+    InputReasonView()
 }
-

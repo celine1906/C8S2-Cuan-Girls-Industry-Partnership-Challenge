@@ -1,15 +1,14 @@
 import SwiftUI
 
 struct InputTrackerView: View {
+    let userWants: UserWants
     @Environment(\.dismiss) private var dismiss
-
-    @State private var avgIncome: String = ""
-    @State private var lowestIncome: String = ""
-    @State private var avgExpense: String = ""
-    @State private var hasInstallment: Bool? = nil
-    @State private var installmentAmount: String = ""
-
-    private let currencyFormatter = NumberFormatter.rupiah
+    @StateObject var viewModel: InputTrackerViewModel
+    
+    init(userWants: UserWants) {
+        self.userWants = userWants
+        _viewModel = StateObject(wrappedValue: InputTrackerViewModel(userWants: userWants))
+    }
 
     var body: some View {
         VStack(spacing: 24) {
@@ -17,21 +16,28 @@ struct InputTrackerView: View {
                 .font(.footnote)
                 .foregroundColor(.gray)
                 .multilineTextAlignment(.center)
-                .padding(10) // jarak dalam kotak
+                .padding(10)
                 .background(Color.white)
                 .cornerRadius(12)
                 .padding(.horizontal, 24)
                 .padding(.top, 20)
 
             Group {
-                InputField(label: "Rata-rata pendapatan bersih", value: $avgIncome)
-                    .onChange(of: avgIncome) { _ in formatCurrencyText(&avgIncome) }
+                InputField(label: "Rata-rata pendapatan bersih", value: $viewModel.avgIncome)
+                    .onChange(of: viewModel.avgIncome) {
+                        viewModel.formatCurrency(&viewModel.avgIncome)
+                    }
 
-                InputField(label: "Pendapatan bersih terendah yang pernah didapatkan", value: $lowestIncome)
-                    .onChange(of: lowestIncome) { _ in formatCurrencyText(&lowestIncome) }
+                if viewModel.isIncomeFluctuating {
+                    InputField(label: "Pendapatan bersih terendah yang pernah didapatkan", value: $viewModel.lowestIncome)
+                        .onChange(of: viewModel.lowestIncome) { viewModel.formatCurrency(&viewModel.lowestIncome)
+                        }
+                }
 
-                InputField(label: "Rata-rata pengeluaran", value: $avgExpense)
-                    .onChange(of: avgExpense) { _ in formatCurrencyText(&avgExpense) }
+                InputField(label: "Rata-rata pengeluaran", value: $viewModel.avgExpense)
+                    .onChange(of: viewModel.avgExpense) {
+                        viewModel.formatCurrency(&viewModel.avgExpense)
+                    }
             }
 
             VStack(alignment: .leading, spacing: 12) {
@@ -39,30 +45,37 @@ struct InputTrackerView: View {
                     .font(.body)
 
                 HStack(spacing: 24) {
-                    RadioButton(title: "Ya", isSelected: hasInstallment == true) {
-                        hasInstallment = true
+                    RadioButton(title: "Ya", isSelected: viewModel.hasInstallment == true) {
+                        viewModel.hasInstallment = true
                     }
-                    RadioButton(title: "Tidak", isSelected: hasInstallment == false) {
-                        hasInstallment = false
+                    RadioButton(title: "Tidak", isSelected: viewModel.hasInstallment == false) {
+                        viewModel.hasInstallment = false
                     }
                 }
             }
             .padding(.trailing, 145)
 
-            if hasInstallment == true {
-                InputField(label: "Nominal cicilan", value: $installmentAmount)
-                    .onChange(of: installmentAmount) { _ in formatCurrencyText(&installmentAmount) }
+            if viewModel.hasInstallment == true {
+                InputField(label: "Nominal cicilan", value: $viewModel.installmentAmount)
+                    .onChange(of: viewModel.installmentAmount) { viewModel.formatCurrency(&viewModel.installmentAmount)
+                    }
             }
 
             Spacer()
 
             Button(action: {
-                // Validasi
+                if viewModel.isFormValid {
+                    viewModel.save()
+                    viewModel.isNavigating.toggle()
+                }
+                
+                
+                print(viewModel.savedUserFinancial ?? "Gagal simpan")
             }) {
                 Text("Cek Status Finansial")
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.white)
+                    .background(viewModel.isFormValid ? Color.white : Color.gray.opacity(0.4))
                     .foregroundColor(.black)
                     .cornerRadius(12)
                     .overlay(
@@ -70,14 +83,13 @@ struct InputTrackerView: View {
                             .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                     )
             }
+            .disabled(!viewModel.isFormValid)
             .padding(.horizontal, 24)
             .padding(.bottom, 32)
         }
         .navigationTitle("Simulasi Peminjaman")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .toolbarBackground(.visible, for: .navigationBar)
-        .toolbarBackground(Color.white, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: { dismiss() }) {
@@ -88,20 +100,9 @@ struct InputTrackerView: View {
             }
         }
         .background(Color(.systemGray6))
-    }
-
-    private func formatCurrencyText(_ text: inout String) {
-        let raw = text.replacingOccurrences(of: ".", with: "")
-        if let doubleVal = Double(raw) {
-            text = currencyFormatter.string(from: NSNumber(value: doubleVal)) ?? ""
+        .navigationDestination(isPresented: $viewModel.isNavigating) {
+            RekomendasiFinansial()
         }
     }
 }
 
-struct InputTrackerView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationStack {
-            InputTrackerView()
-        }
-    }
-}
