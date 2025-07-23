@@ -44,10 +44,10 @@ struct SimulasiPinjaman: View {
                 ScrollView {
                     VStack {
                         VStack(alignment: .leading, spacing: 12) {
-                            infoRow(label: "Nominal Pinjaman", value: "Rp" + formatToCurrency(pinjaman))
-                            infoRow(label: "Bunga Harian (0,3%)", value: "Rp" + formatToCurrency(bunga))
+                            infoRow(label: "Nominal Pinjaman", value: "\(formatToCurrency(pinjaman))")
+                            infoRow(label: "Bunga Harian (0,3%)", value: formatToCurrency(bunga))
                             infoRow(label: "Tenor", value: "180 hari")
-                            infoRow(label: "Total Bunga", value: "Rp" + formatToCurrency(bungaTotal), valueColor: .black, isBold: true)
+                            infoRow(label: "Total Bunga", value: formatToCurrency(bungaTotal), valueColor: .black, isBold: true)
 
                             if selectedTab == .telat1Bulan {
                                 HStack(alignment: .top, spacing: 4) {

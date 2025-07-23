@@ -21,7 +21,6 @@ struct InputSimulationView: View {
     ]
 
     let tenorsOptions = [30, 90, 180, 270]
-    private let currencyFormatter = NumberFormatter.rupiah
 
     var body: some View {
         NavigationView {
@@ -55,8 +54,8 @@ struct InputSimulationView: View {
                     .padding(.horizontal)
 
                     // 3. Nominal Pinjaman
-                    NominalInputCard(value: $loanAmount, formatter: currencyFormatter)
-                        .padding(.horizontal)
+//                    NominalInputCard(value: $loanAmount, formatter: )
+//                        .padding(.horizontal)
 
                     // 4. Status Message
                     StatusMessage(

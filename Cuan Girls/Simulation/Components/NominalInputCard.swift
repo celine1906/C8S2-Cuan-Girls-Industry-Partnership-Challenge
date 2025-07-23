@@ -123,11 +123,3 @@ struct NominalInputCard: View {
     }
 }
 
-struct NominalInputCard_Previews: PreviewProvider {
-    @State static var amount: Double = 6_000_000 // Nilai default sesuai gambar
-    static var previews: some View {
-        NominalInputCard(value: $amount, formatter: NumberFormatter.rupiah)
-            .padding()
-            .previewLayout(.sizeThatFits)
-    }
-}

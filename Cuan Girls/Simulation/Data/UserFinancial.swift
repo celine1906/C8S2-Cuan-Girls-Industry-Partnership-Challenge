@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct UserFinancial: Codable {
+struct UserFinancial: Identifiable {
     var id: Int
     var avgIncome: Int
     var lowestIncome: Int?
     var avgExpense: Int
     var hasInstallment: Bool
-    var installmentAmount: Int?
+    var installmentAmount: Int
 }

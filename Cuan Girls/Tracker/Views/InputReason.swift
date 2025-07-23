@@ -27,11 +27,8 @@ struct InputReasonView: View {
                 TextField("Rp 0", text: $viewModel.rawItemPriceText)
                     .keyboardType(.numberPad)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .focused($isPriceFieldFocused)
-                    .onChange(of: isPriceFieldFocused) { focused, newValue in
-                        if !focused {
-                            viewModel.formatPriceText()
-                        }
+                    .onChange(of: viewModel.rawItemPriceText) {
+                        formatCurrency(&viewModel.rawItemPriceText)
                     }
 
                 // Pesan error

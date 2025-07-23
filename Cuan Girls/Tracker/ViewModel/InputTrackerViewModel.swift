@@ -5,13 +5,6 @@
 //  Created by Regina Celine Adiwinata on 22/07/25.
 //
 
-//
-//  InputTrackerViewModel.swift
-//  Cuan Girls
-//
-//  Created by Regina Celine Adiwinata on 22/07/25.
-//
-
 import Foundation
 import Combine
 
@@ -35,15 +28,25 @@ class InputTrackerViewModel: ObservableObject {
 
     var isFormValid: Bool {
         guard !avgIncome.trimmingCharacters(in: .whitespaces).isEmpty,
-              !avgExpense.trimmingCharacters(in: .whitespaces).isEmpty else {
+              !avgExpense.trimmingCharacters(in: .whitespaces).isEmpty,
+                hasInstallment != nil
+        else {
             return false
         }
-        if isIncomeFluctuating == true {
-            return !lowestIncome.trimmingCharacters(in: .whitespaces).isEmpty
+        
+        // Jika pendapatan fluktuatif, lowestIncome wajib diisi
+        if isIncomeFluctuating && lowestIncome.trimmingCharacters(in: .whitespaces).isEmpty {
+            return false
         }
-        if hasInstallment == true {
-            return !installmentAmount.trimmingCharacters(in: .whitespaces).isEmpty
+
+        // Jika punya cicilan, installmentAmount wajib diisi
+        if let hasInstallment = hasInstallment {
+            if hasInstallment && installmentAmount.trimmingCharacters(in: .whitespaces).isEmpty {
+                return false
+            }
         }
+        
+        
         return true
     }
 
@@ -56,29 +59,9 @@ class InputTrackerViewModel: ObservableObject {
             lowestIncome: isIncomeFluctuating ? lowestIncome.toIntOrNil() : nil,
             avgExpense: avgExpense.toInt(),
             hasInstallment: hasInstallment,
-            installmentAmount: hasInstallment ? installmentAmount.toIntOrNil() : nil
+            installmentAmount: hasInstallment ? installmentAmount.toInt() : 0
         )
     }
-
-    func formatCurrency(_ value: inout String) {
-        let raw = value.replacingOccurrences(of: ".", with: "")
-        if let doubleVal = Double(raw) {
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .decimal
-            formatter.groupingSeparator = "."
-            formatter.maximumFractionDigits = 0
-            value = formatter.string(from: NSNumber(value: doubleVal)) ?? ""
-        }
-    }
 }
 
-private extension String {
-    func toInt() -> Int {
-        return Int(self.replacingOccurrences(of: ".", with: "")) ?? 0
-    }
 
-    func toIntOrNil() -> Int? {
-        let cleaned = self.replacingOccurrences(of: ".", with: "")
-        return Int(cleaned)
-    }
-}

@@ -12,6 +12,9 @@ struct InputTrackerView: View {
 
     var body: some View {
         VStack(spacing: 24) {
+            ScrollView {
+                
+            
             Text("Data ini akan kami gunakan untuk memahami kapasitas finansialmu sebelum mengajukan pinjaman")
                 .font(.footnote)
                 .foregroundColor(.gray)
@@ -25,18 +28,19 @@ struct InputTrackerView: View {
             Group {
                 InputField(label: "Rata-rata pendapatan bersih", value: $viewModel.avgIncome)
                     .onChange(of: viewModel.avgIncome) {
-                        viewModel.formatCurrency(&viewModel.avgIncome)
+                        formatCurrency(&viewModel.avgIncome)
                     }
 
                 if viewModel.isIncomeFluctuating {
                     InputField(label: "Pendapatan bersih terendah yang pernah didapatkan", value: $viewModel.lowestIncome)
-                        .onChange(of: viewModel.lowestIncome) { viewModel.formatCurrency(&viewModel.lowestIncome)
+                        .onChange(of: viewModel.lowestIncome) {
+                            formatCurrency(&viewModel.lowestIncome)
                         }
                 }
 
                 InputField(label: "Rata-rata pengeluaran", value: $viewModel.avgExpense)
                     .onChange(of: viewModel.avgExpense) {
-                        viewModel.formatCurrency(&viewModel.avgExpense)
+                        formatCurrency(&viewModel.avgExpense)
                     }
             }
 
@@ -57,7 +61,8 @@ struct InputTrackerView: View {
 
             if viewModel.hasInstallment == true {
                 InputField(label: "Nominal cicilan", value: $viewModel.installmentAmount)
-                    .onChange(of: viewModel.installmentAmount) { viewModel.formatCurrency(&viewModel.installmentAmount)
+                    .onChange(of: viewModel.installmentAmount) {
+                        formatCurrency(&viewModel.installmentAmount)
                     }
             }
 
@@ -101,7 +106,10 @@ struct InputTrackerView: View {
         }
         .background(Color(.systemGray6))
         .navigationDestination(isPresented: $viewModel.isNavigating) {
-            RekomendasiFinansial()
+            if let savedUserFinancial = viewModel.savedUserFinancial {
+                RekomendasiFinansial(viewModel: RekomendasiFinansialViewModel(userFinancial: savedUserFinancial))
+            }
+        }
         }
     }
 }
