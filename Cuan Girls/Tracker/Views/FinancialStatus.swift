@@ -47,7 +47,7 @@ enum FinancialStatus {
     var color: Color {
         switch self {
         case .tidakDisarankan, .pengeluaranTinggi:
-            return .red
+            return .sisa
         case .sehat:
             return .green
         }

@@ -7,18 +7,22 @@ struct InputField: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(label)
-                .font(.body)
+                .font(.subheadline)
+                .fontWeight(.bold)
 
             HStack {
                 TextField("Rp 0", text: $value)
-                    .keyboardType(.numberPad)
-                    .padding()
+                    .font(.body)
+                    .fontWeight(.regular)
+                    .padding(16)
                     .background(Color.white)
-                    .cornerRadius(10)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.blue.tertiary, lineWidth: 1)
                     )
+                    .cornerRadius(8)
+                    .keyboardType(.numberPad)
+
 
                 Text("/ bulan")
                     .foregroundColor(.gray)
@@ -26,7 +30,7 @@ struct InputField: View {
                     .padding(.leading, 4)
             }
         }
-        .padding(.horizontal)
+        .padding(.horizontal, 16)
     }
 }
 

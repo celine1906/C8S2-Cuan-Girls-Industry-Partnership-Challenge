@@ -3,6 +3,7 @@ import SwiftUI
 struct Bar: View {
     var pengeluaran: CGFloat
     var cicilan: CGFloat
+    var sisaColor: Color
     var sisa: CGFloat {
         max(0, 1 - pengeluaran - cicilan)
     }
@@ -19,7 +20,7 @@ struct Bar: View {
                     .frame(width: geo.size.width * cicilan)
 
                 Rectangle()
-                    .fill(Color.sisa)
+                    .fill(sisaColor)
                     .frame(width: geo.size.width * sisa)
             }
             .frame(height: 16)

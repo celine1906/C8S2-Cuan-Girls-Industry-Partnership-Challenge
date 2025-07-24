@@ -7,53 +7,80 @@ struct InputReasonView: View {
     @StateObject private var viewModel = UserWantsViewModel()
 
     var body: some View {
-        VStack(spacing: 24) {
-            Image("walletIcon")
+        VStack(spacing: 12) {
+            Image(.input1)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 80, height: 80)
-                .padding(.top, 32)
-
+                .frame(maxWidth: .infinity)
+            
             VStack(alignment: .leading, spacing: 16) {
                 Text("Apa yang ingin kamu beli?")
                     .font(.subheadline)
+                    .bold()
+                    .padding(.top, 12)
                 
                 TextField("Aku mau beli...", text: $viewModel.itemName)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .font(.body)
+                    .fontWeight(.regular)
+                    .padding(16)
+                    .background(Color.white)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.blue.tertiary, lineWidth: 1)
+                    )
+                    .cornerRadius(8)
+                    .padding(.bottom, 16)
+
 
                 Text("Nominal barang")
                     .font(.subheadline)
-
-                TextField("Rp 0", text: $viewModel.rawItemPriceText)
-                    .keyboardType(.numberPad)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .onChange(of: viewModel.rawItemPriceText) {
-                        formatCurrency(&viewModel.rawItemPriceText)
-                    }
-
-                // Pesan error
-                if viewModel.isPriceTooLow {
-                    Text("Minimal peminjaman pada P2P Lending adalah Rp 500.000")
-                        .font(.caption)
-                        .foregroundColor(.red)
-                }
+                    .bold()
                 
-                if viewModel.isPriceTooHigh {
-                    Text("Maksimal peminjaman pada P2P Lending adalah Rp 100.000.000")
-                        .font(.caption)
-                        .foregroundColor(.red)
-                }
+                VStack (alignment: .leading) {
+                    TextField("Rp 0", text: $viewModel.rawItemPriceText)
+                        .keyboardType(.numberPad)
+                        .onChange(of: viewModel.rawItemPriceText) {
+                            formatCurrency(&viewModel.rawItemPriceText)
+                        }
+                        .font(.body)
+                        .fontWeight(.regular)
+                        .padding(16)
+                        .background(Color.white)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.blue.tertiary, lineWidth: 1)
+                        )
+                        .cornerRadius(8)
 
+                    // Pesan error
+                    if viewModel.isPriceTooLow {
+                        Text("Minimal peminjaman pada P2P Lending adalah Rp 500.000")
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+                    
+                    if viewModel.isPriceTooHigh {
+                        Text("Maksimal peminjaman pada P2P Lending adalah Rp 100.000.000")
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
+                }
+                .padding(.bottom, 28)
+
+                
                 Text("Apakah pendapatanmu fluktuatif?")
                     .font(.subheadline)
+                    .bold()
 
                 HStack {
                     RadioButton(title: "Ya", isSelected: viewModel.isIncomeFluctuating == true) {
                         viewModel.isIncomeFluctuating = true
                     }
+                    Spacer()
                     RadioButton(title: "Tidak", isSelected: viewModel.isIncomeFluctuating == false) {
                         viewModel.isIncomeFluctuating = false
                     }
+                    Spacer()
                 }
             }
             .padding(.horizontal, 24)
@@ -70,13 +97,9 @@ struct InputReasonView: View {
                 Text("Lanjut")
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(viewModel.isFormValid ? Color.white : Color.gray.opacity(0.4))
-                    .foregroundColor(.black)
+                    .background(viewModel.isFormValid ? Color.button : Color.buttonSecondary)
+                    .foregroundColor(.white)
                     .cornerRadius(12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                    )
             }
             .disabled(!viewModel.isFormValid)
             .padding(.horizontal, 24)
@@ -95,20 +118,21 @@ struct InputReasonView: View {
                 }) {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.black)
-                        .imageScale(.medium)
+                        .imageScale(.large)
+                        .bold()
                 }
             }
         }
-        .background(Color(.systemGray6))
         .navigationDestination(isPresented: $viewModel.isNavigating) {
             if let userWants = viewModel.userWants {
                 InputTrackerView(userWants: userWants)
             }
         }
-
+        .background(Color(.secondaryBlue).ignoresSafeArea())
     }
 }
 
-#Preview {
-    InputReasonView()
-}
+//#Preview {
+//    InputReasonView()
+//}
+

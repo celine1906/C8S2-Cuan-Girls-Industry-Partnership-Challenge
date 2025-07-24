@@ -16,16 +16,20 @@ struct PlatformPicker: View {
             } label: {
                 HStack {
                     Text(selectedPlatform.name)
+                        .font(.body)
                         .foregroundColor(.black)
                     Spacer()
                     Text(selectedPlatform.interestRange)
                         .font(.subheadline)
                         .foregroundColor(.gray)
                     Image(systemName: showList ? "chevron.up" : "chevron.down")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 12, height: 12)
                         .font(.caption)
                         .foregroundColor(.white)
                         .padding(8)
-                        .background(Color.black)
+                        .background(.button)
                         .cornerRadius(8)
                 }
                 .padding()

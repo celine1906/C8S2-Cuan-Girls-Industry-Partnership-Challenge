@@ -12,8 +12,8 @@ struct NominalInputCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Nominal Pinjaman")
-                .font(.headline)
-                .foregroundColor(.gray)
+                .font(.subheadline)
+                .bold()
 
             HStack {
                 Text("Rp")
@@ -56,8 +56,9 @@ struct NominalInputCard: View {
                         }
                     }
                 }) {
-                    Image(systemName: isEditing ? "checkmark.circle.fill" : "pencil")
-                        .foregroundColor(isEditing ? .green : .gray)
+                    Image(systemName: "square.and.pencil")
+                        .foregroundColor(isEditing ? .gray : .black)
+                        .bold()
                 }
                 .padding(.trailing, 16)
             }
@@ -65,7 +66,7 @@ struct NominalInputCard: View {
             .padding(.leading, 16)
             .background(Color(.systemGray6))
             .cornerRadius(10)
-
+            
             Text("Perkiraan batas pinjaman maximum: Rp \(formatToCurrency(viewModel.safeLoanAmount))")
                 .font(.footnote)
                 .foregroundColor(.gray)
@@ -93,10 +94,9 @@ struct NominalInputCard: View {
 
             Text("*Limit pinjaman tiap platform dapat bervariasi")
                 .font(.caption)
-                .foregroundColor(.gray)
         }
-        .padding()
         .background(Color.white)
         .cornerRadius(12)
     }
 }
+

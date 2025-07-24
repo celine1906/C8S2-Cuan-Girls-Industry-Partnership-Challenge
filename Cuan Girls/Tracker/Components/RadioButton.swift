@@ -7,14 +7,16 @@ struct RadioButton: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 8) {
-                Image(systemName: isSelected ? "largecircle.fill.circle" : "circle")
-                    .foregroundColor(.blue)
+            HStack {
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(.button)
                 Text(title)
-                    .foregroundColor(.black)
+                    .font(.body)
+                    .fontWeight(.regular)
             }
         }
-        .padding(.trailing, 16)
+        .buttonStyle(PlainButtonStyle())
     }
 }
+
 

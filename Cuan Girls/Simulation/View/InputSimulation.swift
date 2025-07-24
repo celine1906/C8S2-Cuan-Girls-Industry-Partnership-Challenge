@@ -26,73 +26,99 @@ struct InputSimulationView: View {
     }
 
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Platform P2P legal dan bunganya")
-                        .font(.headline)
-                        .foregroundColor(.gray)
-                        .padding(.horizontal)
-
-                    PlatformPicker(
-                        selectedPlatform: $viewModel.selectedPlatform,
-                        showList: $showPlatformList,
-                        platforms: viewModel.availablePlatforms
-                    )
-                    .padding(.horizontal)
-
-                    Text("*Simulasi akan mengenakan angka bunga \(viewModel.selectedPlatform.maxInterest, specifier: "%.1f")%.")
-                        .font(.footnote)
-                        .foregroundColor(.gray)
-                        .padding(.horizontal)
-
-                    TenorPicker(
-                        selected: $viewModel.selectedTenor,
-                        options: tenorsOptions
-                    )
-                    .padding(.horizontal)
-                    
-                    NominalInputCard(value: $viewModel.loanAmount, viewModel: viewModel)
-                        .padding(.horizontal)
-
-                    StatusMessage(
-                        title: "Cicilan Bulanan",
-                        amount: viewModel.monthlyInstallment,
-                        message: statusText,
-                        color: statusColor,
-                        viewModel: viewModel
-                    )
-                    .padding(.horizontal)
-
-                    Spacer()
-
-                    LihatDetailButton(title: "Lihat Detail") {
-                        print("Lihat Detail button tapped!")
-                    }
-                    .padding(.horizontal)
-                    .padding(.bottom, 20)
-                }
-                .padding(.top, 20)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                
+                NominalInputCard(value: $viewModel.loanAmount, viewModel: viewModel)
             }
-            .navigationTitle("Simulasi Peminjaman")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(true)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(Color.white, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        Image(systemName: "chevron.left")
-                            .foregroundColor(.black)
-                            .imageScale(.medium)
-                    }
-                }
+            .padding(16)
+            
+            Spacer()
+            
+            VStack (alignment: .leading, spacing: 8) {
+                Text("Platform P2P legal dan bunganya")
+                    .font(.subheadline)
+                    .bold()
+
+                PlatformPicker(
+                    selectedPlatform: $viewModel.selectedPlatform,
+                    showList: $showPlatformList,
+                    platforms: viewModel.availablePlatforms
+                )
+                .padding(.top, 4)
+
+                Text("*Simulasi akan mengenakan angka bunga \(viewModel.selectedPlatform.maxInterest, specifier: "%.1f")%.")
+                    .font(.caption)
+
+                TenorPicker(
+                    selected: $viewModel.selectedTenor,
+                    options: tenorsOptions
+                )
+
+                StatusMessage(
+                    title: "Cicilan Bulanan",
+                    amount: viewModel.monthlyInstallment,
+                    message: statusText,
+                    color: statusColor
+                )
+                .padding(.top, 36)
+
             }
-            .background(Color(.systemGroupedBackground).ignoresSafeArea())
+            .padding()
+            .padding(.top, 12)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(.inputField)
+            .padding(.top, 12)
+            
+            Spacer()
+
+            LihatDetailButton(title: "Lihat Detail") {
+                print("Lihat Detail button tapped!")
+            }
+            .padding(.bottom, 20)
+            .padding(.horizontal, 16)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea(edges: .bottom)
+        .navigationTitle("Simulasi Peminjaman")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarBackground(Color.white, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.black)
+                        .imageScale(.medium)
+                }
+            }
+        }
+        .background(Color(.secondaryBlue).ignoresSafeArea())
     }
 }
 
+
+#Preview {
+    let dummyUserFinancial = UserFinancial(
+        id: 1,
+        avgIncome: 5_000_000,
+        lowestIncome: 3_000_000,
+        avgExpense: 2_000_000,
+        hasInstallment: true,
+        installmentAmount: 500_000
+    )
+
+    let dummyUserWants = UserWants(
+        id: 1,
+        itemName: "Handphone Baru",
+        itemPrice: 1_500_000,
+        isIncomeFluctuating: false
+    )
+
+    let viewModel = InputSimulationViewModel(userFinancial: dummyUserFinancial, userWants: dummyUserWants)
+
+    InputSimulationView(viewModel: viewModel)
+}

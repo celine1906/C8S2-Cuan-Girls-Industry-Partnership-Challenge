@@ -12,10 +12,11 @@ struct RecommendationCard: View {
 
     var body: some View {
         HStack {
-            Image(systemName: "bag.fill")
-                .font(.system(size: 28))
+            Image(.bag)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 40, height: 40)
                 .foregroundColor(.blue)
-                .padding()
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(status.title)
@@ -23,12 +24,19 @@ struct RecommendationCard: View {
 
                 Text(status.message)
                     .font(.caption)
-                    .foregroundColor(.black)
+                    .fontWeight(.regular)
             }
-            .padding()
+            .padding(.leading, 8)
         }
+        .padding(16)
         .frame(maxWidth: .infinity)
-        .background(Color.banner)
-        .cornerRadius(10)
+        .background(.blue.tertiary)
+        .cornerRadius(8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+            .inset(by: 0.5)
+            .stroke(.blue.secondary, lineWidth: 1)
+        )
     }
 }
+

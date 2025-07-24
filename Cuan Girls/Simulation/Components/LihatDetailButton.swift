@@ -8,9 +8,11 @@ struct LihatDetailButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
+                .font(.subheadline)
+                .bold()
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color(.black))
+                .background(.button)
                 .foregroundColor(.white)
                 .cornerRadius(12)
         }
@@ -23,6 +25,5 @@ struct LihatDetailButton_Previews: PreviewProvider {
             print("Action button tapped!")
         }
         .padding()
-        .background(Color(.systemGroupedBackground))
     }
 }
