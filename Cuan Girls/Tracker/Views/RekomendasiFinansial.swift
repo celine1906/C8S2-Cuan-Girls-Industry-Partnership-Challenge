@@ -70,7 +70,7 @@ struct RekomendasiFinansial: View {
                     .padding(.top, 20)
 
                     Button(viewModel.status.buttonText) {
-                        // Action
+                        viewModel.isNavigating.toggle()
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -82,31 +82,12 @@ struct RekomendasiFinansial: View {
             }
         }
         .navigationTitle("Rekomendasi Finansial")
-    }
-}
-
-struct RecommendationCard: View {
-    let status: FinancialStatus
-
-    var body: some View {
-        HStack {
-            Image(systemName: "bag.fill")
-                .font(.system(size: 28))
-                .foregroundColor(.blue)
-                .padding()
-
-            VStack(alignment: .leading, spacing: 6) {
-                Text(status.title)
-                    .font(.subheadline.bold())
-
-                Text(status.message)
-                    .font(.caption)
-                    .foregroundColor(.black)
+        .navigationDestination(isPresented: $viewModel.isNavigating) {
+            if viewModel.status == .tidakDisarankan {
+                LoanHomeView()
+            } else {
+                InputSimulationView(viewModel: InputSimulationViewModel(userFinancial: viewModel.userFinancial, userWants: viewModel.userWants))
             }
-            .padding()
         }
-        .frame(maxWidth: .infinity)
-        .background(Color.banner)
-        .cornerRadius(10)
     }
 }

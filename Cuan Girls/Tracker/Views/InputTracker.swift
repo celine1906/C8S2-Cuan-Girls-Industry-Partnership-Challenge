@@ -107,7 +107,7 @@ struct InputTrackerView: View {
         .background(Color(.systemGray6))
         .navigationDestination(isPresented: $viewModel.isNavigating) {
             if let savedUserFinancial = viewModel.savedUserFinancial {
-                RekomendasiFinansial(viewModel: RekomendasiFinansialViewModel(userFinancial: savedUserFinancial))
+                RekomendasiFinansial(viewModel: RekomendasiFinansialViewModel(userFinancial: savedUserFinancial, userWants: userWants))
             }
         }
         }

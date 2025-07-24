@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct UserWants: Codable {
+struct UserWants: Identifiable {
     var id: Int
     var itemName: String
     var itemPrice: Int

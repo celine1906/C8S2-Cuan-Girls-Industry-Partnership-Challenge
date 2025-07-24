@@ -8,10 +8,13 @@
 import Foundation
 
 class RekomendasiFinansialViewModel: ObservableObject {
+    @Published var isNavigating: Bool = false
     let userFinancial: UserFinancial
+    let userWants: UserWants
 
-    init(userFinancial: UserFinancial) {
+    init(userFinancial: UserFinancial, userWants: UserWants) {
         self.userFinancial = userFinancial
+        self.userWants = userWants
     }
 
     var pendapatan: CGFloat {

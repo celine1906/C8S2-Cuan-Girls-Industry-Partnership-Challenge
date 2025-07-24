@@ -4,6 +4,7 @@ func formatToCurrency(_ value: CGFloat) -> String {
     let formatter = NumberFormatter()
     formatter.numberStyle = .decimal
     formatter.groupingSeparator = "."
+    formatter.currencySymbol = "Rp "
     return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
 }
 

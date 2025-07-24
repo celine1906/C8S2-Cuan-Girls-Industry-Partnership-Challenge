@@ -32,6 +32,12 @@ struct InputReasonView: View {
                     }
 
                 // Pesan error
+                if viewModel.isPriceTooLow {
+                    Text("Minimal peminjaman pada P2P Lending adalah Rp 500.000")
+                        .font(.caption)
+                        .foregroundColor(.red)
+                }
+                
                 if viewModel.isPriceTooHigh {
                     Text("Maksimal peminjaman pada P2P Lending adalah Rp 100.000.000")
                         .font(.caption)

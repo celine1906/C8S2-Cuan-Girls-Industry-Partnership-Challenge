@@ -16,13 +16,17 @@ class UserWantsViewModel: ObservableObject {
     @Published var isIncomeFluctuating: Bool? = nil
     
     var isPriceTooHigh: Bool {
-        rawItemPriceText.toInt() > 100_000_000 || rawItemPriceText.toInt() < 500_000
+        rawItemPriceText.toInt() > 100_000_000
+    }
+    
+    var isPriceTooLow: Bool {
+        rawItemPriceText.toInt() < 500_000
     }
 
     var isFormValid: Bool {
         !itemName.trimmingCharacters(in: .whitespaces).isEmpty &&
         rawItemPriceText.toInt() > 0 &&
-        !isPriceTooHigh &&
+        !isPriceTooHigh && !isPriceTooLow &&
         isIncomeFluctuating != nil
     }
 

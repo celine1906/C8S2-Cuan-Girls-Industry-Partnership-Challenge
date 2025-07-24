@@ -19,8 +19,11 @@ struct NominalSlider: View {
             .accentColor(.clear)
             .overlay(GeometryReader { geometry in
                 let width = geometry.size.width
-                let normalizedValue = (value - range.lowerBound) / (range.upperBound - range.lowerBound)
-                let thumbX = CGFloat(normalizedValue) * width
+                let normalizedValue = (Double(value) - range.lowerBound) / (range.upperBound - range.lowerBound)
+                let thumbSize: CGFloat = 28
+                let trackWidth = width - thumbSize
+                let thumbX = CGFloat(normalizedValue) * trackWidth + (thumbSize / 2)
+
                 
                 let threshold1X = CGFloat(riskThreshold1) * width
                 let threshold2X = CGFloat(riskThreshold2) * width
