@@ -17,12 +17,19 @@ enum LoanStatus {
 
 
 final class InputSimulationViewModel: ObservableObject {
+    
+    @Published var isNavigating: Bool = false
+    
+    @Published var calculationResult: LoanCalculationResult?
+
     @Published var loanAmount: Double
     @Published var userAvgIncome: Int
     @Published var selectedPlatform = Platform(name: "EasyCash", interestRange: "0.03% - 0.3%", maxInterest: 0.3)
     @Published var selectedTenor: Int = 180 // in days
-    @Published var monthlyInstallment: String = ""
-    @Published var totalLoans: Int = 0
+    
+    @Published var monthlyInstallment: Double = 0.0
+    @Published var totalInterest: Double = 0.0
+    @Published var totalLoans: Double = 0.0
     @Published var safeLoanAmount: Double = 0.0
     @Published var maxSafeLoanAmount: Double = 0.0
     @Published var availablePlatforms: [Platform] = []
@@ -31,7 +38,7 @@ final class InputSimulationViewModel: ObservableObject {
     @Published var riskThreshold1 = 0.0
     @Published var riskThreshold2 = 0.0
 
-    private var userRestIncome: Int
+    @Published var userRestIncome: Int
     private var cancellables = Set<AnyCancellable>()
 
     init(userFinancial: UserFinancial, userWants: UserWants) {
@@ -74,7 +81,7 @@ final class InputSimulationViewModel: ObservableObject {
         let safeLoan = maxLoan * (Double(tenor) / 30)
         self.safeLoanAmount = safeLoan
 
-        let maxSafeLoan = (Double(userAvgIncome) / (1 + (totalInterest / 100))) * (Double(tenor) / 30)
+        let maxSafeLoan = (Double(userRestIncome) / (1 + (totalInterest / 100))) * (Double(tenor) / 30)
         self.maxSafeLoanAmount = maxSafeLoan
 
         recalculateThresholds()
@@ -91,14 +98,11 @@ final class InputSimulationViewModel: ObservableObject {
 
 
     private func calculateInstallment(amount: Int, tenor: Int, interest: Double) {
-        let totalInterest = Double(amount) * (interest / 100) * Double(tenor)
-        let total = Double(amount) + totalInterest
-        let monthly = total / (Double(tenor) / 30)
+        self.totalInterest = Double(amount) * (interest / 100) * Double(tenor)
+        self.totalLoans = Double(amount) + totalInterest
+        self.monthlyInstallment = totalLoans / (Double(tenor) / 30)
 
-        self.monthlyInstallment = formatToCurrency(monthly)
-        self.totalLoans = Int(total)
-
-        let monthlyInt = Int(monthly)
+        let monthlyInt = Int(monthlyInstallment)
         let greenLimit = Int(Double(userAvgIncome) * 0.3)
 
         if monthlyInt <= greenLimit {
@@ -109,12 +113,18 @@ final class InputSimulationViewModel: ObservableObject {
             loanStatus = .red
         }
     }
-
-    private func formatToCurrency(_ amount: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.currencySymbol = "Rp"
-        formatter.locale = Locale(identifier: "id_ID")
-        return formatter.string(from: NSNumber(value: amount)) ?? "Rp0"
+    
+    func saveLoandata() {
+        calculationResult = LoanCalculationResult(
+            loanAmount: self.loanAmount,
+            dailyInterestRate: (selectedPlatform.maxInterest/100)*self.loanAmount,
+            interestPerDay: selectedPlatform.maxInterest,
+            tenorInDays: selectedTenor,
+            totalInterest: self.totalInterest,
+            totalRepayment: self.totalLoans,
+            monthlyInstallment: self.monthlyInstallment
+        )
     }
+    
+
 }

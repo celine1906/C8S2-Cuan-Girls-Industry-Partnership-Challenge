@@ -115,22 +115,3 @@ struct RekomendasiFinansial: View {
         .background(Color(.secondaryBlue).ignoresSafeArea())
     }
 }
-
-//#Preview {
-//    let savedUserFinancial = UserFinancial(
-//        id: 1,
-//        avgIncome: 5_000_000,
-//        lowestIncome: 4_000_000,
-//        avgExpense: 3_500_000,
-//        hasInstallment: true,
-//        installmentAmount: 500_000
-//    )
-//
-//    let userWants = UserWants(id: 1, itemName: "iPhone 14", itemPrice: 15_000_000, isIncomeFluctuating: false)
-//
-//    let viewModel = RekomendasiFinansialViewModel(userFinancial: savedUserFinancial, userWants: userWants)
-//
-//    RekomendasiFinansial(viewModel: viewModel)
-//
-//}
-

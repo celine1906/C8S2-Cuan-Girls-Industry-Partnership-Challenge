@@ -57,9 +57,10 @@ struct InputSimulationView: View {
 
                 StatusMessage(
                     title: "Cicilan Bulanan",
-                    amount: viewModel.monthlyInstallment,
+                    amount: formatToCurrency(viewModel.monthlyInstallment.rounded()),
                     message: statusText,
-                    color: statusColor
+                    color: statusColor,
+                    income: formatToCurrency(CGFloat(viewModel.userRestIncome))
                 )
                 .padding(.top, 36)
 
@@ -72,11 +73,19 @@ struct InputSimulationView: View {
             
             Spacer()
 
-            LihatDetailButton(title: "Lihat Detail") {
-                print("Lihat Detail button tapped!")
-            }
-            .padding(.bottom, 20)
-            .padding(.horizontal, 16)
+            Button(action: {
+                viewModel.saveLoandata()
+                viewModel.isNavigating.toggle()
+            }) {
+                Text("Lihat Detail")
+                    .font(.subheadline)
+                    .bold()
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(.button)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+            }.disabled(viewModel.loanStatus == .red)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea(edges: .bottom)
@@ -97,6 +106,11 @@ struct InputSimulationView: View {
             }
         }
         .background(Color(.secondaryBlue).ignoresSafeArea())
+        .navigationDestination(isPresented: $viewModel.isNavigating) {
+            if let calculatedResult = viewModel.calculationResult {
+                SimulasiPinjaman(viewModel: SimulasiPinjamanViewModel(loanCalculation: calculatedResult))
+            }
+        }
     }
 }
 

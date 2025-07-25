@@ -9,14 +9,9 @@ struct SimulasiPinjaman: View {
     }
     
     @State private var selectedTab: SimulasiTab = .tepatWaktu
+    @StateObject var viewModel: SimulasiPinjamanViewModel
 
     var body: some View {
-        @State var pinjaman: CGFloat = 6000000
-        @State var tenor: CGFloat = 180
-        
-        let bunga: CGFloat = 0.003 * pinjaman
-        let bungaTotal: CGFloat = bunga * tenor
-        
         ZStack  {
             Color.background
                 .ignoresSafeArea(edges: .bottom)
@@ -44,12 +39,18 @@ struct SimulasiPinjaman: View {
                 ScrollView {
                     VStack {
                         VStack(alignment: .leading, spacing: 12) {
-                            infoRow(label: "Nominal Pinjaman", value: "\(formatToCurrency(pinjaman))")
-                            infoRow(label: "Bunga Harian (0,3%)", value: formatToCurrency(bunga))
-                            infoRow(label: "Tenor", value: "180 hari")
-                            infoRow(label: "Total Bunga", value: formatToCurrency(bungaTotal), valueColor: .black, isBold: true)
+                            infoRow(label: "Nominal Pinjaman", value: "Rp \(formatToCurrency(viewModel.loanCalculation.loanAmount))")
+                            infoRow(label: "Bunga Harian \(viewModel.loanCalculation.interestPerDay)%", value: "Rp \(formatToCurrency(viewModel.loanCalculation.dailyInterestRate))")
+                            infoRow(label: "Tenor", value: "\(viewModel.loanCalculation.tenorInDays) hari")
+                            
 
                             if selectedTab == .telat1Bulan {
+                                infoRow(
+                                    label: "Total Bunga",
+                                    value: "Rp \(formatToCurrency(viewModel.getLateInterest(month: 1)))",
+                                    valueColor: .black,
+                                    isBold: true
+                                )
                                 HStack(alignment: .top, spacing: 4) {
                                     VStack (alignment: .leading) {
                                         Text("Telat 1 Bulan")
@@ -64,13 +65,18 @@ struct SimulasiPinjaman: View {
                                    
                                     Spacer()
                                     
-                                    Text("+ Rp" + formatToCurrency(0.001 * pinjaman * 30))
+                                    Text("+ Rp" + formatToCurrency(viewModel.getPenaltyInterest(month: 1)))
                                         .foregroundColor(.red)
                                 }
                                 .padding()
                                 .background(Color.red.opacity(0.1))
                                 .cornerRadius(10)
                             } else if selectedTab == .telat3Bulan {
+                                infoRow(
+                                    label: "Total Bunga",
+                                    value: "\(formatToCurrency(viewModel.getLateInterest(month: 3)))",
+                                    valueColor: .black,
+                                    isBold: true)
                                 HStack(alignment: .top, spacing: 4) {
                                     VStack (alignment: .leading) {
                                         Text("Telat 3 Bulan")
@@ -85,12 +91,14 @@ struct SimulasiPinjaman: View {
                                    
                                     Spacer()
                                     
-                                    Text("+ Rp" + formatToCurrency(0.001 * pinjaman * 180))
+                                    Text("+ Rp" + formatToCurrency(viewModel.getPenaltyInterest(month: 3)))
                                         .foregroundColor(.red)
                                 }
                                 .padding()
                                 .background(Color.red.opacity(0.1))
                                 .cornerRadius(10)
+                            } else {
+                                infoRow(label: "Total Bunga", value: "Rp \(formatToCurrency(viewModel.loanCalculation.totalInterest))", valueColor: .black, isBold: true)
                             }
                             
                             Divider()
@@ -102,17 +110,11 @@ struct SimulasiPinjaman: View {
                                     
                                     Spacer()
                                     
-                                    Text("Rp" + formatToCurrency(pinjaman + bungaTotal + 0.001 * pinjaman * 30))
+                                    Text("Rp " + formatToCurrency(viewModel.getTotalRepayment(month: 1)))
                                         .foregroundColor(.black)
                                         .fontWeight(.bold)
                                 }
                                 .padding(.top, 4)
-                                
-                                Text("Rp 9.240.000")
-                                    .font(.caption)
-                                    .foregroundColor(.gray)
-                                    .strikethrough()
-                                    .frame(maxWidth: .infinity, alignment: .trailing)
                             } else if selectedTab == .telat3Bulan {
                                 HStack {
                                     Text("Total Pelunasan")
@@ -120,27 +122,17 @@ struct SimulasiPinjaman: View {
                                     
                                     Spacer()
                                     
-                                    Text("Rp" + formatToCurrency(pinjaman + bungaTotal + 0.001 * pinjaman * 180))
+                                    Text("Rp " + formatToCurrency(viewModel.getTotalRepayment(month: 3)))
                                         .foregroundColor(.black)
                                         .fontWeight(.bold)
                                 }
                                 .padding(.top, 4)
-                                
-                                Text("Rp 9.240.000")
-                                    .font(.caption)
-                                    .foregroundColor(.gray)
-                                    .strikethrough()
-                                    .frame(maxWidth: .infinity, alignment: .trailing)
                             } else {
-                                infoRow(label: "Total Pelunasan", value: "Rp" + formatToCurrency(pinjaman + bungaTotal), valueColor: .black)
+                                infoRow(label: "Total Pelunasan", value: "Rp " + formatToCurrency(viewModel.loanCalculation.totalRepayment), valueColor: .black)
                             }
 
-                            if selectedTab == .telat1Bulan {
-                                infoRow(label: "Cicilan Bulanan", value: "Rp" + formatToCurrency((pinjaman + bungaTotal + 0.001 * pinjaman * 30)/(tenor/30)), valueColor: .red)
-                            } else if selectedTab == .telat3Bulan {
-                                infoRow(label: "Cicilan Bulanan", value: "Rp" + formatToCurrency((pinjaman + bungaTotal + 0.001 * pinjaman * 30)/(tenor/30)), valueColor: .red)
-                            } else {
-                                infoRow(label: "Cicilan Bulanan", value: "Rp" + formatToCurrency((pinjaman + bungaTotal)/(tenor/30)), valueColor: .green)
+                            if selectedTab == .tepatWaktu {
+                                infoRow(label: "Cicilan Bulanan", value: "Rp " + formatToCurrency(viewModel.loanCalculation.monthlyInstallment), valueColor: .green)
                             }
                             
                         }
@@ -177,7 +169,7 @@ struct SimulasiPinjaman: View {
                     .padding(.top, 8)
 
                 Button("Selesai") {
-                    // Action
+                    viewModel.isNavigating.toggle()
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
@@ -191,7 +183,9 @@ struct SimulasiPinjaman: View {
             .padding(.top, 20)
             .navigationTitle("Detail Simulasi")
             .navigationBarTitleDisplayMode(.inline)
-            
+            .navigationDestination(isPresented: $viewModel.isNavigating) {
+                LoanHomeView()
+            }
             
         }
     }
@@ -228,8 +222,4 @@ struct SimulasiPinjaman: View {
             }
         }
     }
-}
-
-#Preview {
-    SimulasiPinjaman()
 }

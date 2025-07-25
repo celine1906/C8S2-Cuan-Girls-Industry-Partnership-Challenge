@@ -7,6 +7,7 @@ struct StatusMessage: View {
     let amount: String // Nominal
     let message: String // Messagenya
     let color: Color // Buat colornya
+    let income: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -16,7 +17,7 @@ struct StatusMessage: View {
                     .bold()
                     .foregroundColor(.black)
                 Spacer()
-                Text(amount)
+                Text("Rp \(amount)")
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(color) 
@@ -26,7 +27,7 @@ struct StatusMessage: View {
                 Text("Sisa Uang")
                     .font(.subheadline)
                 Spacer()
-                Text(amount)
+                Text("Rp \(income)")
                     .font(.subheadline)
             }
             

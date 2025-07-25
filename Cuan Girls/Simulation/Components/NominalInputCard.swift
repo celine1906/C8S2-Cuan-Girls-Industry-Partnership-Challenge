@@ -67,7 +67,7 @@ struct NominalInputCard: View {
             .background(Color(.systemGray6))
             .cornerRadius(10)
             
-            Text("Perkiraan batas pinjaman maximum: Rp \(formatToCurrency(viewModel.safeLoanAmount))")
+            Text("Saran batas pinjaman aman: Rp \(formatToCurrency(viewModel.safeLoanAmount > 100_000_000 ? 100_000_000 : viewModel.safeLoanAmount))")
                 .font(.footnote)
                 .foregroundColor(.gray)
 
