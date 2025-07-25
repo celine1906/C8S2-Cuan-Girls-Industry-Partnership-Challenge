@@ -5,13 +5,17 @@ struct InputReasonView: View {
 
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = UserWantsViewModel()
+    @State private var isKeyboardVisible = false
 
     var body: some View {
         VStack(spacing: 12) {
-            Image(.input1)
-                .resizable()
-                .scaledToFit()
-                .frame(maxWidth: .infinity)
+            if !isKeyboardVisible {
+                Image(.input2)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity)
+                    .transition(.opacity)
+            }
             
             VStack(alignment: .leading, spacing: 16) {
                 Text("Apa yang ingin kamu beli?")
@@ -83,7 +87,8 @@ struct InputReasonView: View {
                     Spacer()
                 }
             }
-            .padding(.horizontal, 24)
+            .padding(.top, 16)
+            .padding(.horizontal,16)
 
             Spacer()
 
@@ -129,10 +134,21 @@ struct InputReasonView: View {
             }
         }
         .background(Color(.secondaryBlue).ignoresSafeArea())
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+            withAnimation {
+                isKeyboardVisible = true
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            withAnimation {
+                isKeyboardVisible = false
+            }
+        }
+
     }
 }
 
-//#Preview {
-//    InputReasonView()
-//}
+#Preview {
+    InputReasonView()
+}
 

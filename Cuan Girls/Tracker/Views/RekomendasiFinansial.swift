@@ -6,12 +6,12 @@ struct RekomendasiFinansial: View {
 
     var body: some View {
         VStack (alignment: .leading, spacing: 12) {
-            Image(.input1)
+            Image(viewModel.status.image)
                 .resizable()
                 .scaledToFit()
                 .frame(maxWidth: .infinity)
         
-            VStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text("Sisa uang kamu ")
                     .font(.headline)
                     .fontWeight(.bold) +
@@ -24,7 +24,6 @@ struct RekomendasiFinansial: View {
                     .fontWeight(.bold)
                 
                 Bar(pengeluaran: viewModel.pengeluaranRatio, cicilan: viewModel.cicilanRatio, sisaColor: viewModel.status.color)
-                    .padding(.horizontal, 20)
                 
                 VStack(alignment: .center, spacing: 8) {
                     HStack {
@@ -59,8 +58,8 @@ struct RekomendasiFinansial: View {
                         Text("Sisa uangmu")
                         Spacer()
                         Text("Rp" + viewModel.formatToCurrency(viewModel.sisa))
+                            .foregroundColor(viewModel.status.color)
                     }
-                    .foregroundColor(viewModel.status.color)
                 }
                 .font(.subheadline)
             }
@@ -72,9 +71,16 @@ struct RekomendasiFinansial: View {
             .padding(.horizontal, 16)
             .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 2)
             
-            RecommendationCard(status: viewModel.status)
-                .padding()
-
+            VStack (alignment: .leading) {
+                RecommendationCard(status: viewModel.status)
+                    .padding(.top, 16)
+                
+                Text("*OJK menyarankan cicilan maksimal 30% dari pendapatan")
+                    .font(.caption)
+            }
+            .padding(.horizontal, 16)
+            
+           
             Spacer()
             
             Button(viewModel.status.buttonText) {
@@ -114,4 +120,22 @@ struct RekomendasiFinansial: View {
         }
         .background(Color(.secondaryBlue).ignoresSafeArea())
     }
+}
+
+#Preview {
+    let savedUserFinancial = UserFinancial(
+        id: 1,
+        avgIncome: 5_000_000,
+        lowestIncome: 4_000_000,
+        avgExpense: 3_000_000,
+        hasInstallment: true,
+        installmentAmount: 500_000
+    )
+
+    let userWants = UserWants(id: 1, itemName: "iPhone 14", itemPrice: 15_000_000, isIncomeFluctuating: false)
+
+    let viewModel = RekomendasiFinansialViewModel(userFinancial: savedUserFinancial, userWants: userWants)
+
+    RekomendasiFinansial(viewModel: viewModel)
+
 }

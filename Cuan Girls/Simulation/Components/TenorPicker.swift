@@ -34,7 +34,7 @@ struct TenorPicker: View {
             }
             .padding(.top, 8)
         }
-        .padding(.top, 24)
+        .padding(.top, 12)
     }
 }
 

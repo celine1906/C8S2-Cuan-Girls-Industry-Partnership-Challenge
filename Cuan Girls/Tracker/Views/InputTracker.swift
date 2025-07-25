@@ -4,6 +4,7 @@ struct InputTrackerView: View {
     let userWants: UserWants
     @Environment(\.dismiss) private var dismiss
     @StateObject var viewModel: InputTrackerViewModel
+    @State private var isKeyboardVisible = false
     
     init(userWants: UserWants) {
         self.userWants = userWants
@@ -12,11 +13,14 @@ struct InputTrackerView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Image(.input2)
-                .resizable()
-                .scaledToFit()
-                .frame(maxWidth: .infinity)
             
+            if !isKeyboardVisible {
+                Image(.input2)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity)
+                    .transition(.opacity)
+            }
             
             ScrollView {
                 VStack (alignment: .leading) {
@@ -62,14 +66,15 @@ struct InputTrackerView: View {
                         }
                     }
                     .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
                     
                     if viewModel.hasInstallment == true {
                         InputField(label: "Nominal cicilan", value: $viewModel.installmentAmount)
                             .onChange(of: viewModel.installmentAmount) {
                                 formatCurrency(&viewModel.installmentAmount)
-                            }
-                            .padding(.top, 12)
-                        
+                        }
+                        .padding(.top, 12)
+                        .padding(.bottom, 28)
                     }
                 }
                 .padding(.top, 24)
@@ -112,6 +117,16 @@ struct InputTrackerView: View {
                 .padding(.horizontal, 24)
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+            withAnimation {
+                isKeyboardVisible = true
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            withAnimation {
+                isKeyboardVisible = false
+            }
+        }
         .navigationTitle("Simulasi Peminjaman")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
@@ -134,9 +149,9 @@ struct InputTrackerView: View {
     }
 }
 
-//#Preview {
-//    let userWants = UserWants(id: 1, itemName: "iPhone 14", itemPrice: 15_000_000, isIncomeFluctuating: true)
-//
-//    InputTrackerView(userWants: userWants)
-//}
+#Preview {
+    let userWants = UserWants(id: 1, itemName: "iPhone 14", itemPrice: 15_000_000, isIncomeFluctuating: true)
+
+    InputTrackerView(userWants: userWants)
+}
 

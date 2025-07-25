@@ -4,7 +4,6 @@ struct LoanHomeView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 32) {
-                
                 Spacer()
 
                 // Icon target

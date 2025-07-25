@@ -13,7 +13,7 @@ struct SimulasiPinjaman: View {
 
     var body: some View {
         ZStack  {
-            Color.background
+            Color.blueBackground
                 .ignoresSafeArea(edges: .bottom)
             
             VStack (alignment: .center){
@@ -60,7 +60,7 @@ struct SimulasiPinjaman: View {
                                         
                                         Text("*Penalti harian (0,1%)")
                                             .font(.caption)
-                                            .foregroundColor(.gray)
+                                            .foregroundColor(.red)
                                     }
                                    
                                     Spacer()
@@ -70,7 +70,7 @@ struct SimulasiPinjaman: View {
                                 }
                                 .padding()
                                 .background(Color.red.opacity(0.1))
-                                .cornerRadius(10)
+                                
                             } else if selectedTab == .telat3Bulan {
                                 infoRow(
                                     label: "Total Bunga",
@@ -86,7 +86,7 @@ struct SimulasiPinjaman: View {
                                         
                                         Text("*Penalti harian (0,1%)")
                                             .font(.caption)
-                                            .foregroundColor(.gray)
+                                            .foregroundColor(.red)
                                     }
                                    
                                     Spacer()
@@ -96,67 +96,83 @@ struct SimulasiPinjaman: View {
                                 }
                                 .padding()
                                 .background(Color.red.opacity(0.1))
-                                .cornerRadius(10)
+                                
                             } else {
-                                infoRow(label: "Total Bunga", value: "Rp \(formatToCurrency(viewModel.loanCalculation.totalInterest))", valueColor: .black, isBold: true)
+                                infoRow(label: "Total Bunga", value: "+Rp \(formatToCurrency(viewModel.loanCalculation.totalInterest))", valueColor: .black, isBold: true)
                             }
                             
                             Divider()
 
                             if selectedTab == .telat1Bulan {
-                                HStack {
+                                HStack (alignment: .center) {
                                     Text("Total Pelunasan")
                                         .bold()
                                     
                                     Spacer()
+                                    
+                                    Image(systemName: "triangle.fill")
+                                        .foregroundColor(.red)
+                                        .font(.caption)
                                     
                                     Text("Rp " + formatToCurrency(viewModel.getTotalRepayment(month: 1)))
                                         .foregroundColor(.black)
                                         .fontWeight(.bold)
                                 }
                                 .padding(.top, 4)
+                                .padding(.horizontal, 16)
+                                .padding(.bottom, 16)
                             } else if selectedTab == .telat3Bulan {
-                                HStack {
+                                HStack (alignment: .center) {
                                     Text("Total Pelunasan")
                                         .bold()
                                     
                                     Spacer()
+                                    
+                                    Image(systemName: "triangle.fill")
+                                        .foregroundColor(.red)
+                                        .font(.caption)
                                     
                                     Text("Rp " + formatToCurrency(viewModel.getTotalRepayment(month: 3)))
                                         .foregroundColor(.black)
                                         .fontWeight(.bold)
                                 }
                                 .padding(.top, 4)
+                                .padding(.horizontal, 16)
+                                .padding(.bottom, 16)
                             } else {
                                 infoRow(label: "Total Pelunasan", value: "Rp " + formatToCurrency(viewModel.loanCalculation.totalRepayment), valueColor: .black)
                             }
+                                
 
                             if selectedTab == .tepatWaktu {
-                                infoRow(label: "Cicilan Bulanan", value: "Rp " + formatToCurrency(viewModel.loanCalculation.monthlyInstallment), valueColor: .green)
+                                infoRow(label: "Cicilan Bulanan", value: "Rp " + formatToCurrency(viewModel.loanCalculation.monthlyInstallment), valueColor: .black)
+                                    .padding(.bottom, 12)
                             }
-                            
                         }
-                        .padding()
                         .background(Color.white)
                         .cornerRadius(8)
                         .padding(.horizontal)
 
                         
                         VStack(alignment: .leading, spacing: 16) {
-                            tipsRow(icon: "lightbulb.fill", color: .yellow, title: "Perhatikan jumlah total pelunasan,", subtitle: "bukan hanya cicilan per bulan.")
+                            tipsRow(icon: "warning", color: .orange, title: "Telat di atas 90 hari berarti gagal bayar", subtitle: "akibatnya akses pinjamanmu akan dibatasi.")
+
+                            Divider()
+                            
+                            tipsRow(icon: "lamp", color: .yellow, title: "Perhatikan jumlah total pelunasan,", subtitle: "bukan hanya cicilan per bulan.")
                             
                             Divider()
                             
-                            tipsRow(icon: "clock.fill", color: .blue, title: "Selalu bayar tepat waktu", subtitle: "hindari denda & jaga skor kreditmu.")
-                            
-                            Divider()
-                            
-                            tipsRow(icon: "exclamationmark.triangle.fill", color: .orange, title: "Gagal bayar akan merusak skor kredit", subtitle: "Akses pinjamanmu dapat terbatas.")
+                            tipsRow(icon: "clock", color: .blue, title: "Selalu bayar tepat waktu", subtitle: "hindari denda & jaga skor kreditmu.")
+                
                         }
-                        .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.white)
+                        .background(Color.tertiaryBlue)
                         .cornerRadius(8)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.buttonSecondary, lineWidth: 1)
+                        )
                         .padding(.horizontal)
                         .padding(.top, 16)
                     }
@@ -164,8 +180,7 @@ struct SimulasiPinjaman: View {
                 Spacer()
 
                 Text("*Limit pinjaman tiap platform dapat bervariasi. Jumlah yang dikalkulasikan hanya untuk keperluan simulasi.")
-                    .font(.footnote)
-                    .foregroundColor(.gray)
+                    .font(.caption)
                     .padding(.top, 8)
 
                 Button("Selesai") {
@@ -202,11 +217,13 @@ struct SimulasiPinjaman: View {
                 .fontWeight(isBold ? .semibold : .regular)
         }
         .padding(.vertical, 4)
+        .padding(.horizontal)
+        .padding(.top, 12)
     }
 
     func tipsRow(icon: String, color: Color, title: String, subtitle: String) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: icon)
+        HStack(alignment: .center, spacing: 12) {
+            Image(icon)
                 .font(.title2)
                 .foregroundColor(color)
                 .frame(width: 30)
@@ -220,6 +237,25 @@ struct SimulasiPinjaman: View {
                     .font(.caption)
                     .foregroundColor(.black)
             }
+            .padding(.leading, 12)
         }
     }
 }
+
+#Preview {
+    let dummyLoanCalculation = LoanCalculationResult(
+        loanAmount: 2_000_000,
+        dailyInterestRate: 0.01,
+        interestPerDay: 0.01,
+        tenorInDays: 30,
+        totalInterest: 600_000,
+        totalRepayment: 2_600_000,
+        monthlyInstallment: 866_667
+    )
+    
+    let dummyViewModel = SimulasiPinjamanViewModel(loanCalculation: dummyLoanCalculation)
+
+    return SimulasiPinjaman(viewModel: dummyViewModel)
+}
+
+

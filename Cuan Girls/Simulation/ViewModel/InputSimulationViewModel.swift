@@ -15,7 +15,6 @@ enum LoanStatus {
     case red
 }
 
-
 final class InputSimulationViewModel: ObservableObject {
     
     @Published var isNavigating: Bool = false

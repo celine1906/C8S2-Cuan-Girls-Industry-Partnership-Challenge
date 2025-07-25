@@ -22,7 +22,7 @@ struct RecommendationCard: View {
                 Text(status.title)
                     .font(.subheadline.bold())
 
-                Text(status.message)
+                status.message
                     .font(.caption)
                     .fontWeight(.regular)
             }
@@ -30,7 +30,7 @@ struct RecommendationCard: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity)
-        .background(.blue.tertiary)
+        .background(.tertiaryBlue)
         .cornerRadius(8)
         .overlay(
             RoundedRectangle(cornerRadius: 8)

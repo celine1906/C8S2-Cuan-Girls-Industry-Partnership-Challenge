@@ -12,11 +12,11 @@ enum FinancialStatus {
     case tidakDisarankan
     case pengeluaranTinggi
     case sehat
-
+    
     var title: String {
         switch self {
         case .tidakDisarankan:
-            return "Kamu tidak disarankan untuk melakukan peminjaman"
+            return "Yah, sisa uangmu terlalu rendah"
         case .pengeluaranTinggi:
             return "Pengeluaran kamu cukup tinggi nih"
         case .sehat:
@@ -24,14 +24,14 @@ enum FinancialStatus {
         }
     }
 
-    var message: String {
+    var message: Text {
         switch self {
         case .tidakDisarankan:
-            return "Ayo **tabung 30% dari pendapatanmu** setiap bulannya agar keuanganmu lebih sehat"
+            return Text("Limit minimum pinjaman di P2P lending adalah Rp 500.000. Coba **sisihkan minimal 30% dari pendapatanmu** untuk ditabung ya!")
         case .pengeluaranTinggi:
-            return "Coba **sisihkan minimal 30% dari pendapatanmu** untuk ditabung ya!\nTapi tenang, kamu tetap bisa lanjut simulasi kok"
+            return Text("Coba **sisihkan minimal 30% dari pendapatanmu** untuk ditabung ya! Tenang, kamu tetap bisa lanjut simulasi kok")
         case .sehat:
-            return "agar tidak melebihi 30% dari pendapatanmu"
+            return Text("Dengan sisa uang lebih dari 30%, kamu sudah bisa melakukan pinjaman.")
         }
     }
 
@@ -49,7 +49,18 @@ enum FinancialStatus {
         case .tidakDisarankan, .pengeluaranTinggi:
             return .sisa
         case .sehat:
-            return .green
+            return .sisaAman
+        }
+    }
+    
+    var image: String {
+        switch self {
+        case .tidakDisarankan:
+            return "output3"
+        case .pengeluaranTinggi:
+            return "output2"
+        case .sehat:
+            return "output1"
         }
     }
 }

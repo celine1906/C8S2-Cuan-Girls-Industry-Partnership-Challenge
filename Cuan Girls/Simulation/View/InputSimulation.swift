@@ -9,31 +9,29 @@ struct InputSimulationView: View {
 
     let tenorsOptions = [30, 90, 180, 365]
     
-    private var statusText: String {
+    private var statusText: Text {
         switch viewModel.loanStatus {
-        case .green: return "Cicilan sudah di bawah 30% pendapatanmu."
-        case .yellow: return "Cicilan sudah di atas 30% pendapatanmu."
-        case .red: return "Cicilan melebihi sisa pendapatanmu."
+        case .green: return Text("Cicilan **sudah di bawah** sisa uangmu.")
+        case .yellow: return Text("Cicilan **hampir sama dengan** sisa uangmu.")
+        case .red: return Text("Cicilan **sudah melebihi** sisa uangmu.")
         }
     }
 
     private var statusColor: Color {
         switch viewModel.loanStatus {
-        case .green: return .green
+        case .green: return .sisaAman
         case .yellow: return .yellow
         case .red: return .red
         }
     }
 
     var body: some View {
-        ScrollView {
+        VStack {
             VStack(alignment: .leading, spacing: 16) {
-                
                 NominalInputCard(value: $viewModel.loanAmount, viewModel: viewModel)
             }
-            .padding(16)
-            
-            Spacer()
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
             
             VStack (alignment: .leading, spacing: 8) {
                 Text("Platform P2P legal dan bunganya")
@@ -62,17 +60,14 @@ struct InputSimulationView: View {
                     color: statusColor,
                     income: formatToCurrency(CGFloat(viewModel.userRestIncome))
                 )
-                .padding(.top, 36)
+                .padding(.top, 12)
 
             }
             .padding()
-            .padding(.top, 12)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.top, 4)
             .background(.inputField)
             .padding(.top, 12)
             
-            Spacer()
-
             Button(action: {
                 viewModel.saveLoandata()
                 viewModel.isNavigating.toggle()
@@ -85,10 +80,12 @@ struct InputSimulationView: View {
                     .background(.button)
                     .foregroundColor(.white)
                     .cornerRadius(12)
-            }.disabled(viewModel.loanStatus == .red)
+            }
+            .padding(.horizontal, 16)
+            .disabled(viewModel.loanStatus == .red)
+            
+            Spacer()
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .ignoresSafeArea(edges: .bottom)
         .navigationTitle("Simulasi Peminjaman")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
@@ -116,23 +113,27 @@ struct InputSimulationView: View {
 
 
 #Preview {
-    let dummyUserFinancial = UserFinancial(
-        id: 1,
-        avgIncome: 5_000_000,
-        lowestIncome: 3_000_000,
-        avgExpense: 2_000_000,
-        hasInstallment: true,
-        installmentAmount: 500_000
-    )
+    
+    NavigationStack {
+        let dummyUserFinancial = UserFinancial(
+            id: 1,
+            avgIncome: 5_000_000,
+            lowestIncome: 3_000_000,
+            avgExpense: 2_000_000,
+            hasInstallment: true,
+            installmentAmount: 500_000
+        )
 
-    let dummyUserWants = UserWants(
-        id: 1,
-        itemName: "Handphone Baru",
-        itemPrice: 1_500_000,
-        isIncomeFluctuating: false
-    )
+        let dummyUserWants = UserWants(
+            id: 1,
+            itemName: "Handphone Baru",
+            itemPrice: 1_500_000,
+            isIncomeFluctuating: false
+        )
 
-    let viewModel = InputSimulationViewModel(userFinancial: dummyUserFinancial, userWants: dummyUserWants)
+        let viewModel = InputSimulationViewModel(userFinancial: dummyUserFinancial, userWants: dummyUserWants)
 
-    InputSimulationView(viewModel: viewModel)
+        InputSimulationView(viewModel: viewModel)
+    }
+   
 }

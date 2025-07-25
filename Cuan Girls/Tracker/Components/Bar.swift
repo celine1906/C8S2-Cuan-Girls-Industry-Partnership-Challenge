@@ -29,3 +29,4 @@ struct Bar: View {
         .frame(height: 16)
     }
 }
+

@@ -5,7 +5,7 @@ import SwiftUI
 struct StatusMessage: View {
     let title: String // Cicilan Bulanan
     let amount: String // Nominal
-    let message: String // Messagenya
+    let message: Text // Messagenya
     let color: Color // Buat colornya
     let income: String
 
@@ -34,7 +34,7 @@ struct StatusMessage: View {
             Divider()
                 .background(color)
             
-            Text(message)
+            message
                 .font(.caption)
                 .foregroundColor(color)
         }
