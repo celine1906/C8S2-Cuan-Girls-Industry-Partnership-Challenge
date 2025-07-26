@@ -77,7 +77,7 @@ struct InputSimulationView: View {
                     .bold()
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(.button)
+                    .background(viewModel.loanStatus == .red ? Color.button.opacity(0.5) : Color.button)
                     .foregroundColor(.white)
                     .cornerRadius(12)
             }
