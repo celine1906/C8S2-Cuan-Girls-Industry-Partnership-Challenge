@@ -114,6 +114,7 @@ struct RekomendasiFinansial: View {
         .navigationDestination(isPresented: $viewModel.isNavigating) {
             if viewModel.status == .tidakDisarankan {
                 LoanHomeView()
+                    .navigationBarBackButtonHidden(true)
             } else {
                 InputSimulationView(viewModel: InputSimulationViewModel(userFinancial: viewModel.userFinancial, userWants: viewModel.userWants))
             }

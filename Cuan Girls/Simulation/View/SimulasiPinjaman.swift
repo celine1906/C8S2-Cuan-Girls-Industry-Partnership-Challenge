@@ -8,6 +8,7 @@ struct SimulasiPinjaman: View {
         case telat3Bulan = "Telat 3 Bulan"
     }
     
+    @Environment(\.dismiss) private var dismiss
     @State private var selectedTab: SimulasiTab = .tepatWaktu
     @StateObject var viewModel: SimulasiPinjamanViewModel
 
@@ -39,15 +40,15 @@ struct SimulasiPinjaman: View {
                 ScrollView {
                     VStack {
                         VStack(alignment: .leading, spacing: 12) {
-                            infoRow(label: "Nominal Pinjaman", value: "Rp \(formatToCurrency(viewModel.loanCalculation.loanAmount))")
-                            infoRow(label: "Bunga Harian \(viewModel.loanCalculation.interestPerDay)%", value: "Rp \(formatToCurrency(viewModel.loanCalculation.dailyInterestRate))")
+                            infoRow(label: "Nominal Pinjaman", value: "\(formatToCurrency(viewModel.loanCalculation.loanAmount))")
+                            infoRow(label: "Bunga Harian \(viewModel.loanCalculation.interestPerDay)%", value: "\(formatToCurrency(viewModel.loanCalculation.dailyInterestRate))")
                             infoRow(label: "Tenor", value: "\(viewModel.loanCalculation.tenorInDays) hari")
                             
 
                             if selectedTab == .telat1Bulan {
                                 infoRow(
                                     label: "Total Bunga",
-                                    value: "Rp \(formatToCurrency(viewModel.getLateInterest(month: 1)))",
+                                    value: "\(formatToCurrency(viewModel.getLateInterest(month: 1)))",
                                     valueColor: .black,
                                     isBold: true
                                 )
@@ -65,7 +66,7 @@ struct SimulasiPinjaman: View {
                                    
                                     Spacer()
                                     
-                                    Text("+ Rp" + formatToCurrency(viewModel.getPenaltyInterest(month: 1)))
+                                    Text("+ " + formatToCurrency(viewModel.getPenaltyInterest(month: 1)))
                                         .foregroundColor(.red)
                                 }
                                 .padding()
@@ -91,14 +92,14 @@ struct SimulasiPinjaman: View {
                                    
                                     Spacer()
                                     
-                                    Text("+ Rp" + formatToCurrency(viewModel.getPenaltyInterest(month: 3)))
+                                    Text("+ " + formatToCurrency(viewModel.getPenaltyInterest(month: 3)))
                                         .foregroundColor(.red)
                                 }
                                 .padding()
                                 .background(Color.red.opacity(0.1))
                                 
                             } else {
-                                infoRow(label: "Total Bunga", value: "+Rp \(formatToCurrency(viewModel.loanCalculation.totalInterest))", valueColor: .black, isBold: true)
+                                infoRow(label: "Total Bunga", value: "+  \(formatToCurrency(viewModel.loanCalculation.totalInterest))", valueColor: .black, isBold: true)
                             }
                             
                             Divider()
@@ -114,7 +115,7 @@ struct SimulasiPinjaman: View {
                                         .foregroundColor(.red)
                                         .font(.caption)
                                     
-                                    Text("Rp " + formatToCurrency(viewModel.getTotalRepayment(month: 1)))
+                                    Text(formatToCurrency(viewModel.getTotalRepayment(month: 1)))
                                         .foregroundColor(.black)
                                         .fontWeight(.bold)
                                 }
@@ -132,7 +133,7 @@ struct SimulasiPinjaman: View {
                                         .foregroundColor(.red)
                                         .font(.caption)
                                     
-                                    Text("Rp " + formatToCurrency(viewModel.getTotalRepayment(month: 3)))
+                                    Text(formatToCurrency(viewModel.getTotalRepayment(month: 3)))
                                         .foregroundColor(.black)
                                         .fontWeight(.bold)
                                 }
@@ -140,12 +141,12 @@ struct SimulasiPinjaman: View {
                                 .padding(.horizontal, 16)
                                 .padding(.bottom, 16)
                             } else {
-                                infoRow(label: "Total Pelunasan", value: "Rp " + formatToCurrency(viewModel.loanCalculation.totalRepayment), valueColor: .black)
+                                infoRow(label: "Total Pelunasan", value: formatToCurrency(viewModel.loanCalculation.totalRepayment), valueColor: .black)
                             }
                                 
 
                             if selectedTab == .tepatWaktu {
-                                infoRow(label: "Cicilan Bulanan", value: "Rp " + formatToCurrency(viewModel.loanCalculation.monthlyInstallment), valueColor: .black)
+                                infoRow(label: "Cicilan Bulanan", value: formatToCurrency(viewModel.loanCalculation.monthlyInstallment), valueColor: .black)
                                     .padding(.bottom, 12)
                             }
                         }
@@ -198,8 +199,21 @@ struct SimulasiPinjaman: View {
             .padding(.top, 20)
             .navigationTitle("Detail Simulasi")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.black)
+                            .imageScale(.medium)
+                    }
+                }
+            }
             .navigationDestination(isPresented: $viewModel.isNavigating) {
                 LoanHomeView()
+                    .navigationBarBackButtonHidden(true)
             }
             
         }

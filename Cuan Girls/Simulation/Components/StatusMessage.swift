@@ -17,7 +17,7 @@ struct StatusMessage: View {
                     .bold()
                     .foregroundColor(.black)
                 Spacer()
-                Text("Rp \(amount)")
+                Text("\(amount)")
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(color) 
@@ -27,7 +27,7 @@ struct StatusMessage: View {
                 Text("Sisa Uang")
                     .font(.subheadline)
                 Spacer()
-                Text("Rp \(income)")
+                Text("\(income)")
                     .font(.subheadline)
             }
             

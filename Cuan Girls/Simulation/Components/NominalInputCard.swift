@@ -16,11 +16,6 @@ struct NominalInputCard: View {
                 .bold()
 
             HStack {
-                Text("Rp")
-                    .font(.title2)
-                    .bold()
-                    .foregroundColor(.black)
-
                 if isEditing {
                     TextField("Masukkan nominal", text: $inputText)
                         .keyboardType(.numberPad)
@@ -33,7 +28,7 @@ struct NominalInputCard: View {
                             formatCurrency(&inputText)
                         }
                         .onAppear {
-                            inputText = String(value)
+                            inputText = formatToCurrency(CGFloat(value))
                         }
                 } else {
                     Text(formatToCurrency(CGFloat(value)))
@@ -50,10 +45,15 @@ struct NominalInputCard: View {
 
                 Button(action: {
                     withAnimation {
-                        isEditing.toggle()
+//                        isEditing.toggle()
                         if isEditing {
-                            inputText = String(value)
+                            if let parsed = inputText.toIntOrNil() {
+                                value = Double(parsed)
+                            }
+                        } else {
+                            inputText = formatToCurrency(CGFloat(value))
                         }
+                        isEditing.toggle()
                     }
                 }) {
                     Image(systemName: "square.and.pencil")
@@ -65,9 +65,9 @@ struct NominalInputCard: View {
             .padding(.vertical, 14)
             .padding(.leading, 16)
             .background(Color(.systemGray6))
-            .cornerRadius(10)
             
-            Text("Saran batas pinjaman aman: Rp \(formatToCurrency(viewModel.safeLoanAmount > 100_000_000 ? 100_000_000 : viewModel.safeLoanAmount))")
+            
+            Text("Saran batas pinjaman aman: \(formatToCurrency(viewModel.safeLoanAmount > 100_000_000 ? 100_000_000 : viewModel.safeLoanAmount))")
                 .font(.footnote)
                 .foregroundColor(.gray)
 
