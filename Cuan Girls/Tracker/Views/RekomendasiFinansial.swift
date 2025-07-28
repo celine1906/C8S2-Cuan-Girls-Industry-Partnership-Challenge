@@ -12,16 +12,21 @@ struct RekomendasiFinansial: View {
                 .frame(maxWidth: .infinity)
         
             VStack(alignment: .leading, spacing: 8) {
-                Text("Sisa uang kamu ")
-                    .font(.headline)
-                    .fontWeight(.bold) +
-                Text("\(Int(viewModel.persenSisa))%")
-                    .foregroundColor(viewModel.status.color)
-                    .fontWeight(.bold)
-                    .font(.headline) +
-                Text(" dari pendapatan")
-                    .font(.headline)
-                    .fontWeight(.bold)
+                if viewModel.persenSisa <= 0 {
+                        Text("Sisa uang kamu ")
+                            .font(.headline).fontWeight(.bold) +
+                        Text("0")
+                            .foregroundColor(viewModel.status.color)
+                            .font(.headline).fontWeight(.bold)
+                    } else {
+                            Text("Sisa uang kamu ")
+                                .font(.headline).fontWeight(.bold) +
+                            Text("\(Int(viewModel.persenSisa))%")
+                                .foregroundColor(viewModel.status.color)
+                                .font(.headline).fontWeight(.bold) +
+                            Text(" dari pendapatan")
+                                .font(.headline).fontWeight(.bold)
+                    }
                 
                 Bar(pengeluaran: viewModel.pengeluaranRatio, cicilan: viewModel.cicilanRatio, sisaColor: viewModel.status.color)
                 
