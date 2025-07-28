@@ -1,107 +1,157 @@
 import SwiftUI
 
 struct InputTrackerView: View {
+    let userWants: UserWants
     @Environment(\.dismiss) private var dismiss
-
-    @State private var avgIncome: String = ""
-    @State private var lowestIncome: String = ""
-    @State private var avgExpense: String = ""
-    @State private var hasInstallment: Bool? = nil
-    @State private var installmentAmount: String = ""
-
-    private let currencyFormatter = NumberFormatter.rupiah
+    @StateObject var viewModel: InputTrackerViewModel
+    @State private var isKeyboardVisible = false
+    
+    init(userWants: UserWants) {
+        self.userWants = userWants
+        _viewModel = StateObject(wrappedValue: InputTrackerViewModel(userWants: userWants))
+    }
 
     var body: some View {
-        VStack(spacing: 24) {
-            Text("Data ini akan kami gunakan untuk memahami kapasitas finansialmu sebelum mengajukan pinjaman")
-                .font(.footnote)
-                .foregroundColor(.gray)
-                .multilineTextAlignment(.center)
-                .padding(10) // jarak dalam kotak
-                .background(Color.white)
-                .cornerRadius(12)
-                .padding(.horizontal, 24)
-                .padding(.top, 20)
-
-            Group {
-                InputField(label: "Rata-rata pendapatan bersih", value: $avgIncome)
-                    .onChange(of: avgIncome) { _ in formatCurrencyText(&avgIncome) }
-
-                InputField(label: "Pendapatan bersih terendah yang pernah didapatkan", value: $lowestIncome)
-                    .onChange(of: lowestIncome) { _ in formatCurrencyText(&lowestIncome) }
-
-                InputField(label: "Rata-rata pengeluaran", value: $avgExpense)
-                    .onChange(of: avgExpense) { _ in formatCurrencyText(&avgExpense) }
+        VStack(spacing: 0) {
+            
+            if !isKeyboardVisible {
+                Image(.input2)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity)
+                    .transition(.opacity)
             }
-
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Apakah kamu punya cicilan?")
-                    .font(.body)
-
-                HStack(spacing: 24) {
-                    RadioButton(title: "Ya", isSelected: hasInstallment == true) {
-                        hasInstallment = true
+            
+            ScrollView {
+                VStack (alignment: .leading) {
+                    Group {
+                        InputField(label: "Rata-rata pendapatan bersih", value: $viewModel.avgIncome)
+                            .onChange(of: viewModel.avgIncome) {
+                                formatCurrency(&viewModel.avgIncome)
+                            }
+                            .padding(.bottom, 28)
+                        
+                        if viewModel.isIncomeFluctuating {
+                            InputField(label: "Pendapatan bersih terendah yang pernah didapatkan", value: $viewModel.lowestIncome)
+                                .onChange(of: viewModel.lowestIncome) {
+                                    formatCurrency(&viewModel.lowestIncome)
+                                }
+                                .padding(.bottom, 28)
+                        }
+                        
+                        InputField(label: "Rata-rata pengeluaran", value: $viewModel.avgExpense)
+                            .onChange(of: viewModel.avgExpense) {
+                                formatCurrency(&viewModel.avgExpense)
+                            }
+                            .padding(.bottom, 28)
                     }
-                    RadioButton(title: "Tidak", isSelected: hasInstallment == false) {
-                        hasInstallment = false
+                    
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Apakah kamu punya cicilan yang sedang berjalan?")
+                            .font(.subheadline)
+                            .bold()
+                        
+                        HStack(spacing: 24) {
+                            RadioButton(title: "Ya", isSelected: viewModel.hasInstallment == true) {
+                                viewModel.hasInstallment = true
+                            }
+                            
+                            Spacer()
+                            
+                            RadioButton(title: "Tidak", isSelected: viewModel.hasInstallment == false) {
+                                viewModel.hasInstallment = false
+                            }
+                            
+                            Spacer()
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
+                    
+                    if viewModel.hasInstallment == true {
+                        InputField(label: "Nominal cicilan", value: $viewModel.installmentAmount)
+                            .onChange(of: viewModel.installmentAmount) {
+                                formatCurrency(&viewModel.installmentAmount)
+                        }
+                        .padding(.top, 12)
+                        .padding(.bottom, 28)
                     }
                 }
+                .padding(.top, 24)
             }
-            .padding(.trailing, 145)
-
-            if hasInstallment == true {
-                InputField(label: "Nominal cicilan", value: $installmentAmount)
-                    .onChange(of: installmentAmount) { _ in formatCurrencyText(&installmentAmount) }
-            }
-
-            Spacer()
-
-            Button(action: {
-                // Validasi
-            }) {
-                Text("Cek Status Finansial")
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.white)
+            .border(Color.gray.opacity(0.1), width: 1)
+            
+            VStack(spacing: 0) {
+                
+                Text("*Data ini akan kami gunakan untuk memahami kapasitas finansialmu sebelum mengajukan pinjaman.")
+                    .lineLimit(nil)
+                    .font(.caption)
+                    .fontWeight(.regular)
                     .foregroundColor(.black)
+                    .multilineTextAlignment(.leading)
+                    .padding(10)
                     .cornerRadius(12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                    )
+                    .padding(.horizontal, 16)
+                
+                Button(action: {
+                    if viewModel.isFormValid {
+                        viewModel.save()
+                        viewModel.isNavigating.toggle()
+                    }
+                    
+                    
+                    print(viewModel.savedUserFinancial ?? "Gagal simpan")
+                }) {
+                    Text("Cek Status Finansial")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(viewModel.isFormValid ? Color.button : Color.buttonSecondary)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                        )
+                }
+                .disabled(!viewModel.isFormValid)
+                .padding(.horizontal, 24)
             }
-            .padding(.horizontal, 24)
-            .padding(.bottom, 32)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+            withAnimation {
+                isKeyboardVisible = true
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            withAnimation {
+                isKeyboardVisible = false
+            }
         }
         .navigationTitle("Simulasi Peminjaman")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .toolbarBackground(.visible, for: .navigationBar)
-        .toolbarBackground(Color.white, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: { dismiss() }) {
                     Image(systemName: "chevron.left")
-                        .foregroundColor(.gray)
-                        .imageScale(.medium)
+                        .imageScale(.large)
+                        .foregroundColor(.black)
+                        .bold()
                 }
             }
         }
-        .background(Color(.systemGray6))
-    }
-
-    private func formatCurrencyText(_ text: inout String) {
-        let raw = text.replacingOccurrences(of: ".", with: "")
-        if let doubleVal = Double(raw) {
-            text = currencyFormatter.string(from: NSNumber(value: doubleVal)) ?? ""
+        .navigationDestination(isPresented: $viewModel.isNavigating) {
+            if let savedUserFinancial = viewModel.savedUserFinancial {
+                RekomendasiFinansial(viewModel: RekomendasiFinansialViewModel(userFinancial: savedUserFinancial, userWants: userWants))
+            }
         }
+        .background(Color(.secondaryBlue).ignoresSafeArea())
     }
 }
 
-struct InputTrackerView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationStack {
-            InputTrackerView()
-        }
-    }
+#Preview {
+    let userWants = UserWants(id: 1, itemName: "iPhone 14", itemPrice: 15_000_000, isIncomeFluctuating: true)
+
+    InputTrackerView(userWants: userWants)
 }
+

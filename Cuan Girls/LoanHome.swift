@@ -7,21 +7,21 @@ struct LoanHomeView: View {
                 Spacer()
 
                 // Icon target
-                Image(systemName: "target")
+                Image(.homepage)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 100, height: 100)
-                    .foregroundColor(.gray)
+                    .frame(width: 227, height: 227)
 
                 // Text kosong
                 VStack(spacing: 4) {
                     Text("Mulai simulasi peminjaman?")
                         .font(.body)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.black)
+                        .fontWeight(.bold)
+                    
                     Text("Kamu belum memulai simulasi apapun")
                         .font(.subheadline)
-                        .foregroundColor(.gray)
+                        .opacity(0.7)
+                        .fontWeight(.regular)
                 }
 
                 Spacer()
@@ -31,8 +31,10 @@ struct LoanHomeView: View {
                     Text("Mulai Simulasi")
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.white)
-                        .foregroundColor(.black)
+                        .background(.button)
+                        .foregroundColor(.white)
+                        .font(.subheadline)
+                        .bold()
                         .cornerRadius(12)
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
@@ -42,9 +44,15 @@ struct LoanHomeView: View {
                 .padding(.horizontal, 24)
                 .padding(.bottom, 32)
             }
-            .navigationTitle("Simulasi Peminjaman")
             .navigationBarTitleDisplayMode(.inline)
-            .background(Color(.systemGray6).ignoresSafeArea())
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Simulasi Peminjaman")
+                        .font(.title3)
+                        .fontWeight(.bold)
+                }
+            }
+            .background(Color(.secondaryBlue).ignoresSafeArea())
         }
     }
 }

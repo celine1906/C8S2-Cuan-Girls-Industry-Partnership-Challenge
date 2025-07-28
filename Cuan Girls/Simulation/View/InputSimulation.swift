@@ -4,106 +4,138 @@ import SwiftUI
 
 struct InputSimulationView: View {
     @Environment(\.dismiss) private var dismiss
-
-    @State private var loanAmount: Double = 6_000_000
-    @State private var selectedPlatform = Platform(name: "Pilih platform", interestRange: "-", maxInterest: 0)
+    @StateObject var viewModel: InputSimulationViewModel
     @State private var showPlatformList = false
-    @State private var selectedTenor: Int = 180
-    @State private var monthlyInstallment: String = "1.540.000"
-    @State private var isAffordable: Bool = true
 
-    let availablePlatforms: [Platform] = [
-        Platform(name: "EasyCash", interestRange: "0.03% - 0.3%", maxInterest: 0.3),
-        Platform(name: "AkuLaku", interestRange: "0.1% - 0.3%", maxInterest: 0.3),
-        Platform(name: "AdaPundi", interestRange: "0.15% - 0.3%", maxInterest: 0.3),
-        Platform(name: "Indosaku", interestRange: "0.02% - 0.3%", maxInterest: 0.3),
-        Platform(name: "Kredivo", interestRange: "0.05% - 0.3%", maxInterest: 0.3)
-    ]
+    let tenorsOptions = [30, 90, 180, 365]
+    
+    private var statusText: Text {
+        switch viewModel.loanStatus {
+        case .green: return Text("Cicilan **sudah di bawah** sisa uangmu.")
+        case .yellow: return Text("Cicilan **hampir sama dengan** sisa uangmu.")
+        case .red: return Text("Cicilan **sudah melebihi** sisa uangmu.")
+        }
+    }
 
-    let tenorsOptions = [30, 90, 180, 270]
-    private let currencyFormatter = NumberFormatter.rupiah
+    private var statusColor: Color {
+        switch viewModel.loanStatus {
+        case .green: return .sisaAman
+        case .yellow: return .yellow
+        case .red: return .red
+        }
+    }
 
     var body: some View {
-        NavigationView {
-            ScrollView { // Tetap gunakan ScrollView untuk konten yang bisa memanjang
-                VStack(alignment: .leading, spacing: 16) { // alignment .leading untuk teks
-                    // Judul Platform P2P legal dan bunganya (di sini sekarang)
+        ScrollView {
+            VStack {
+                VStack(alignment: .leading, spacing: 16) {
+                    NominalInputCard(value: $viewModel.loanAmount, viewModel: viewModel)
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+                
+                VStack (alignment: .leading, spacing: 8) {
                     Text("Platform P2P legal dan bunganya")
-                        .font(.headline)
-                        .foregroundColor(.gray)
-                        .padding(.horizontal) // Berikan padding horizontal
-
-                    // Platform Picker
+                        .font(.subheadline)
+                        .bold()
+                    
                     PlatformPicker(
-                        selectedPlatform: $selectedPlatform,
+                        selectedPlatform: $viewModel.selectedPlatform,
                         showList: $showPlatformList,
-                        platforms: availablePlatforms
+                        platforms: viewModel.availablePlatforms
                     )
-                    .padding(.horizontal) // Padding horizontal untuk PlatformPicker
-
-                    // Teks simulasi bunga (di sini sekarang)
-                    Text("*Simulasi akan mengenakan angka bunga \(selectedPlatform.maxInterest, specifier: "%.1f")%.")
-                        .font(.footnote)
-                        .foregroundColor(.gray)
-                        .padding(.horizontal) // Berikan padding horizontal
-
-                    // 2. Tenor Picker
+                    .padding(.top, 4)
+                    
+                    Text("*Simulasi akan mengenakan angka bunga \(viewModel.selectedPlatform.maxInterest, specifier: "%.1f")%.")
+                        .font(.caption)
+                    
                     TenorPicker(
-                        selected: $selectedTenor,
+                        selected: $viewModel.selectedTenor,
                         options: tenorsOptions
                     )
-                    .padding(.horizontal)
-
-                    // 3. Nominal Pinjaman
-                    NominalInputCard(value: $loanAmount, formatter: currencyFormatter)
-                        .padding(.horizontal)
-
-                    // 4. Status Message
+                    
                     StatusMessage(
                         title: "Cicilan Bulanan",
-                        amount: "Rp \(monthlyInstallment)",
-                        message: isAffordable
-                            ? "Cicilan sudah di bawah 30% pendapatanmu."
-                            : "Cicilan sudah di atas 30% pendapatanmu.",
-                        isPositive: isAffordable
+                        amount: formatToCurrency(viewModel.monthlyInstallment.rounded()),
+                        message: statusText,
+                        color: statusColor,
+                        income: formatToCurrency(CGFloat(viewModel.userRestIncome))
                     )
-                    .padding(.horizontal)
-
-                    Spacer()
-
-                    // 5. Lihat Detail Button
-                    LihatDetailButton(title: "Lihat Detail") {
-                        print("Lihat Detail button tapped!")
-                    }
-                    .padding(.horizontal)
-                    .padding(.bottom, 20)
+                    .padding(.top, 12)
+                    
                 }
-                .padding(.top, 20)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding()
+                .padding(.top, 4)
+                .background(.inputField)
+                .padding(.top, 12)
+                
+                Button(action: {
+                    viewModel.saveLoandata()
+                    viewModel.isNavigating.toggle()
+                }) {
+                    Text("Lihat Detail")
+                        .font(.subheadline)
+                        .bold()
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(viewModel.loanStatus == .red ? Color.button.opacity(0.5) : Color.button)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                }
+                .padding(.horizontal, 16)
+                .disabled(viewModel.loanStatus == .red)
+                
+                Spacer()
             }
-            .navigationTitle("Simulasi Peminjaman")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(true)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(Color.white, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        Image(systemName: "chevron.left")
-                            .foregroundColor(.black)
-                            .imageScale(.medium)
-                    }
+        }
+        .navigationTitle("Simulasi Peminjaman")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarBackground(Color.white, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.black)
+                        .imageScale(.medium)
                 }
             }
-            .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        }
+        .background(Color(.secondaryBlue).ignoresSafeArea())
+        .navigationDestination(isPresented: $viewModel.isNavigating) {
+            if let calculatedResult = viewModel.calculationResult {
+                SimulasiPinjaman(viewModel: SimulasiPinjamanViewModel(loanCalculation: calculatedResult))
+            }
         }
     }
 }
 
-struct InputSimulationView_Previews: PreviewProvider {
-    static var previews: some View {
-        InputSimulationView()
+
+#Preview {
+    
+    NavigationStack {
+        let dummyUserFinancial = UserFinancial(
+            id: 1,
+            avgIncome: 5_000_000,
+            lowestIncome: 3_000_000,
+            avgExpense: 2_000_000,
+            hasInstallment: true,
+            installmentAmount: 500_000
+        )
+
+        let dummyUserWants = UserWants(
+            id: 1,
+            itemName: "Handphone Baru",
+            itemPrice: 1_500_000,
+            isIncomeFluctuating: false
+        )
+
+        let viewModel = InputSimulationViewModel(userFinancial: dummyUserFinancial, userWants: dummyUserWants)
+
+        InputSimulationView(viewModel: viewModel)
     }
+   
 }

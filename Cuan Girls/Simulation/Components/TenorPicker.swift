@@ -9,8 +9,8 @@ struct TenorPicker: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Tenor Peminjaman")
-                .font(.headline)
-                .foregroundColor(.gray)
+                .font(.subheadline)
+                .bold()
 
             HStack(spacing: 8) {
                 ForEach(options, id: \.self) { tenor in
@@ -21,7 +21,7 @@ struct TenorPicker: View {
                             .font(.subheadline)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 12)
-                            .background(selected == tenor ? Color.black : Color.clear)
+                            .background(selected == tenor ? Color.button : Color.clear)
                             .foregroundColor(selected == tenor ? .white : .black)
                             .cornerRadius(8)
                             .overlay(
@@ -32,15 +32,9 @@ struct TenorPicker: View {
                     }
                 }
             }
-            .frame(maxWidth: .infinity)
-            .padding(.all, 8)
-            .background(Color.white)
-            .cornerRadius(8)
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(.gray.opacity(0.1))
-            )
+            .padding(.top, 8)
         }
+        .padding(.top, 12)
     }
 }
 
